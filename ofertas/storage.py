@@ -1,10 +1,14 @@
-"""Escritura a CSV (compatible con Excel: UTF-8 con BOM y separador ;)
-y a JSON estatico para el sitio publicado (site/data/)."""
+"""Escritura a CSV (compatible con Excel: UTF-8 con BOM y separador ;),
+a JSON estatico para el sitio publicado (site/data/) y al historico
+inmutable diario (Capa 1: historia/AAAA-MM-DD.csv.gz)."""
 import csv
+import gzip
+import io
 import json
 import os
 import re
 import unicodedata
+from datetime import datetime, timezone
 from .model import Oferta, CSV_FIELDS
 
 
@@ -18,6 +22,43 @@ def escribir_csv(ofertas: list[Oferta], path: str, sep: str = ";") -> int:
         for o in ofertas:
             w.writerow(o.row())
     return len(ofertas)
+
+
+def escribir_snapshot(ofertas: list[Oferta], dirpath: str, fecha: str | None = None) -> str | None:
+    """Capa 1 - histórico inmutable. Congela la captura del día en
+    historia/AAAA-MM-DD.csv.gz (mismas columnas que el CSV principal).
+
+    Regla de idempotencia/completitud: si ya existe el snapshot del día, solo
+    se reescribe cuando la corrida nueva trae MÁS filas (p.ej. la corrida local
+    con 13 tiendas no debe ser pisada por una corrida en la nube con 8). Así un
+    re-run nunca degrada el registro del día. Devuelve la ruta escrita o None
+    si se conservó el existente.
+    """
+    if not ofertas:
+        return None
+    os.makedirs(dirpath, exist_ok=True)
+    if fecha is None:
+        fecha = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d")
+    path = os.path.join(dirpath, f"{fecha}.csv.gz")
+
+    # No degradar un snapshot más completo ya escrito hoy.
+    if os.path.exists(path):
+        try:
+            with gzip.open(path, "rt", encoding="utf-8", newline="") as f:
+                existentes = sum(1 for _ in f) - 1  # menos el header
+            if existentes >= len(ofertas):
+                return None
+        except OSError:
+            pass  # archivo corrupto: lo regeneramos
+
+    buf = io.StringIO()
+    w = csv.DictWriter(buf, fieldnames=CSV_FIELDS, delimiter=";")
+    w.writeheader()
+    for o in sorted(ofertas, key=lambda o: (o.tienda, -o.descuento_pct)):
+        w.writerow(o.row())
+    with gzip.open(path, "wt", encoding="utf-8", newline="") as f:
+        f.write(buf.getvalue())
+    return path
 
 
 def _slug(s: str) -> str:

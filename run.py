@@ -13,7 +13,7 @@ import os
 import time
 
 from ofertas.validate import filtrar
-from ofertas.storage import escribir_csv, escribir_json
+from ofertas.storage import escribir_csv, escribir_json, escribir_snapshot
 
 logging.basicConfig(
     level=logging.INFO,
@@ -70,6 +70,7 @@ def main():
     n = escribir_csv(validas, args.out)
     json_dir = os.path.join(BASE, "site", "data")
     nt_json = escribir_json(validas, json_dir)
+    snap = escribir_snapshot(validas, os.path.join(BASE, "historia"))
 
     print("\n" + "=" * 56)
     print(f"  RESUMEN  ({len(crudas)} crudas -> {len(validas)} validas)")
@@ -86,6 +87,10 @@ def main():
     print("=" * 56)
     print(f"  CSV:  {args.out}  ({n} filas)")
     print(f"  JSON: {json_dir}  ({nt_json} tiendas, para el sitio)")
+    if snap:
+        print(f"  SNAP: {snap}  (histórico inmutable)")
+    else:
+        print("  SNAP: conservado (ya existía un snapshot más completo del día)")
     print("=" * 56)
 
 
