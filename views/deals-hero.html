@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ofertas del Día · Supermercados Chile</title>
+<style>
+  :root{
+    --bg:#f4f5f9;
+    --ink:#16181f;
+    --muted:#6b7280;
+    --line:#e7e9f0;
+    --card:#ffffff;
+    --accent:#ff2e63;
+    --accent2:#ff8a00;
+    --ok:#1fa02e;
+    --radius:16px;
+    --shadow:0 6px 22px rgba(20,24,40,.08);
+    --shadow-hi:0 12px 36px rgba(20,24,40,.16);
+    --topbar:44px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding-top:var(--topbar);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.4;
+  }
+  a{color:inherit;text-decoration:none}
+  img{display:block}
+  button{font-family:inherit;cursor:pointer}
+
+  /* ===== Sticky header (toolbar) — sits below the injected 44px bar ===== */
+  .appbar{
+    position:sticky;
+    top:var(--topbar);
+    z-index:50;
+    background:linear-gradient(110deg,#ff2e63 0%,#ff5a3c 48%,#ff8a00 100%);
+    color:#fff;
+    box-shadow:0 4px 18px rgba(255,46,99,.28);
+  }
+  .appbar-inner{
+    max-width:1280px;margin:0 auto;padding:12px 18px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .brand-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .logo{
+    display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px;letter-spacing:.3px;
+  }
+  .logo .spark{
+    width:34px;height:34px;border-radius:10px;background:#fff;color:var(--accent);
+    display:grid;place-items:center;font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,.18);
+    transform:rotate(-6deg);
+  }
+  .logo small{font-weight:700;opacity:.92;font-size:12px;display:block;letter-spacing:.6px}
+  .live-pill{
+    margin-left:auto;display:inline-flex;align-items:center;gap:7px;
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+    padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.4px;
+    backdrop-filter:blur(4px);
+  }
+  .live-dot{width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 0 rgba(255,255,255,.9);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.7)}70%{box-shadow:0 0 0 9px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+
+  /* search + controls */
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .search{
+    flex:1 1 300px;min-width:220px;position:relative;display:flex;align-items:center;
+  }
+  .search input{
+    width:100%;border:none;border-radius:12px;padding:12px 14px 12px 42px;font-size:15px;
+    background:#fff;color:var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.0);outline:none;
+  }
+  .search input:focus{box-shadow:0 0 0 3px rgba(255,255,255,.55)}
+  .search .ico{position:absolute;left:14px;font-size:16px;opacity:.55;pointer-events:none}
+  select{
+    border:none;border-radius:12px;padding:11px 14px;font-size:14px;font-weight:700;color:var(--ink);
+    background:#fff;outline:none;cursor:pointer;box-shadow:var(--shadow);max-width:200px;
+  }
+  select:focus{box-shadow:0 0 0 3px rgba(255,255,255,.55)}
+  .count-chip{
+    font-size:13px;font-weight:800;background:rgba(0,0,0,.18);color:#fff;
+    padding:9px 14px;border-radius:12px;white-space:nowrap;
+  }
+
+  /* ===== Layout ===== */
+  .wrap{max-width:1280px;margin:0 auto;padding:18px 18px 80px}
+
+  .section-title{
+    display:flex;align-items:center;gap:10px;margin:30px 4px 14px;
+  }
+  .section-title h2{font-size:20px;margin:0;font-weight:900;letter-spacing:.2px}
+  .section-title .badge-bullet{width:12px;height:24px;border-radius:5px;background:var(--accent)}
+  .section-title .hint{font-size:12px;color:var(--muted);font-weight:600;margin-left:6px}
+
+  /* ===== HERO ===== */
+  .hero{
+    background:
+      radial-gradient(900px 300px at 12% -10%, rgba(255,138,0,.20), transparent 60%),
+      radial-gradient(900px 300px at 100% 0%, rgba(255,46,99,.18), transparent 55%),
+      linear-gradient(180deg,#fff,#fff);
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:18px;
+    box-shadow:var(--shadow);
+    margin-top:6px;
+  }
+  .hero-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:2px 4px 14px;flex-wrap:wrap}
+  .hero-head h1{
+    margin:0;font-size:26px;font-weight:900;letter-spacing:.2px;
+    background:linear-gradient(90deg,#ff2e63,#ff8a00);-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero-head p{margin:2px 0 0;color:var(--muted);font-size:13px;font-weight:600}
+  .hero-grid{
+    display:grid;gap:14px;
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  }
+  .hero-card{
+    position:relative;display:flex;flex-direction:column;
+    background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    box-shadow:var(--shadow);transition:transform .15s ease, box-shadow .15s ease;min-height:0;
+  }
+  .hero-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hi)}
+  .hero-card .pct{
+    position:absolute;top:0;left:0;z-index:3;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:10px 12px 8px;border-bottom-right-radius:18px;
+    background:linear-gradient(135deg,#ff2e63,#ff5a3c);color:#fff;line-height:.85;
+    box-shadow:4px 4px 14px rgba(255,46,99,.35);
+  }
+  .hero-card .pct b{font-size:38px;font-weight:900;letter-spacing:-1px}
+  .hero-card .pct span{font-size:11px;font-weight:800;margin-top:3px;opacity:.95}
+  .hero-card .imgbox{
+    height:170px;background:#fafbfd;display:grid;place-items:center;padding:14px;
+  }
+  .hero-card .imgbox img{max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply}
+  .hero-card .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .hero-card .name{font-size:14px;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:36px}
+  .hero-card .prices{margin-top:auto;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+  .hero-card .now{font-size:23px;font-weight:900;color:var(--ink)}
+  .hero-card .was{font-size:13px;color:var(--muted);text-decoration:line-through}
+
+  .store-badge{
+    display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
+    color:#fff;font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;letter-spacing:.3px;
+    text-transform:uppercase;
+  }
+  .meta-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .brand-txt{font-size:12px;color:var(--muted);font-weight:600;text-transform:capitalize}
+
+  /* ===== Carousels per store ===== */
+  .carousel-block{margin-top:6px}
+  .carousel-wrap{position:relative}
+  .carousel{
+    display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;
+    padding:6px 4px 16px;scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch;
+  }
+  .carousel::-webkit-scrollbar{height:8px}
+  .carousel::-webkit-scrollbar-thumb{background:#d6d9e4;border-radius:999px}
+  .carousel::-webkit-scrollbar-track{background:transparent}
+
+  .pcard{
+    scroll-snap-align:start;flex:0 0 200px;width:200px;
+    background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:var(--shadow);display:flex;flex-direction:column;
+    transition:transform .14s ease, box-shadow .14s ease;
+  }
+  .pcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-hi)}
+  .pcard .imgbox{height:140px;background:#fafbfd;display:grid;place-items:center;padding:12px;position:relative}
+  .pcard .imgbox img{max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply}
+  .pcard .disc{
+    position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#ff2e63,#ff5a3c);color:#fff;
+    font-size:13px;font-weight:900;padding:4px 8px;border-radius:9px;box-shadow:0 4px 10px rgba(255,46,99,.3);
+  }
+  .pcard .body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:5px;flex:1}
+  .pcard .name{font-size:13px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px}
+  .pcard .prices{margin-top:auto;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+  .pcard .now{font-size:18px;font-weight:900}
+  .pcard .was{font-size:12px;color:var(--muted);text-decoration:line-through}
+  .pcard .ppu{font-size:11px;color:var(--muted);font-weight:600}
+
+  .arrow{
+    position:absolute;top:42%;transform:translateY(-50%);z-index:6;
+    width:38px;height:38px;border-radius:50%;border:none;background:#fff;color:var(--ink);
+    box-shadow:var(--shadow-hi);font-size:18px;font-weight:900;display:none;align-items:center;justify-content:center;
+  }
+  .arrow.left{left:-6px}.arrow.right{right:-6px}
+  .carousel-wrap:hover .arrow{display:flex}
+  @media(hover:none){.arrow{display:none!important}}
+
+  /* ===== Grid (search/filter results mode) ===== */
+  .results-grid{
+    display:grid;gap:14px;margin-top:4px;
+    grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  }
+  .gcard{
+    background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .14s ease, box-shadow .14s ease;
+  }
+  .gcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-hi)}
+  .gcard .imgbox{height:150px;background:#fafbfd;display:grid;place-items:center;padding:12px;position:relative}
+  .gcard .imgbox img{max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply}
+  .gcard .disc{position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#ff2e63,#ff5a3c);color:#fff;font-size:13px;font-weight:900;padding:4px 8px;border-radius:9px;box-shadow:0 4px 10px rgba(255,46,99,.3)}
+  .gcard .body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:5px;flex:1}
+  .gcard .name{font-size:13px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px}
+  .gcard .prices{margin-top:auto;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+  .gcard .now{font-size:18px;font-weight:900}
+  .gcard .was{font-size:12px;color:var(--muted);text-decoration:line-through}
+  .gcard .ppu{font-size:11px;color:var(--muted);font-weight:600}
+
+  .loadmore{
+    display:block;margin:26px auto 0;padding:14px 30px;border:none;border-radius:14px;
+    background:linear-gradient(135deg,#ff2e63,#ff8a00);color:#fff;font-weight:900;font-size:15px;
+    box-shadow:0 8px 22px rgba(255,46,99,.32);letter-spacing:.3px;
+  }
+  .loadmore:active{transform:translateY(1px)}
+  .loadmore[hidden]{display:none}
+
+  .empty{
+    text-align:center;padding:60px 20px;color:var(--muted);
+  }
+  .empty .big{font-size:46px;margin-bottom:10px}
+  .empty h3{margin:0 0 6px;color:var(--ink);font-size:18px}
+
+  .skeleton{
+    background:linear-gradient(100deg,#eef0f6 30%,#f7f8fc 50%,#eef0f6 70%);
+    background-size:200% 100%;animation:sk 1.2s infinite;border-radius:16px;height:260px;
+  }
+  @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  .results-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 4px 0}
+  .results-head .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .fchip{font-size:12px;font-weight:800;background:#fff;border:1px solid var(--line);color:var(--ink);padding:6px 11px;border-radius:999px;box-shadow:var(--shadow);display:inline-flex;align-items:center;gap:6px}
+  .fchip button{border:none;background:none;color:var(--muted);font-weight:900;font-size:14px;line-height:1;padding:0;margin-left:2px}
+
+  footer{max-width:1280px;margin:0 auto;padding:24px 18px 50px;color:var(--muted);font-size:12px;text-align:center}
+
+  @media (max-width:560px){
+    .hero-head h1{font-size:22px}
+    .hero-card .pct b{font-size:32px}
+    select{flex:1 1 calc(50% - 5px);max-width:none}
+    .count-chip{flex:1 1 100%;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+  <header class="appbar">
+    <div class="appbar-inner">
+      <div class="brand-row">
+        <div class="logo">
+          <span class="spark">%</span>
+          <div>
+            OfertasYa<small>SÚPER · CHILE</small>
+          </div>
+        </div>
+        <span class="live-pill"><span class="live-dot"></span> OFERTAS EN VIVO</span>
+      </div>
+      <div class="controls">
+        <label class="search">
+          <span class="ico">🔎</span>
+          <input id="q" type="search" placeholder="Buscar producto o marca… (ej: aceite, Soprole)" autocomplete="off">
+        </label>
+        <select id="fStore"><option value="">Todas las tiendas</option></select>
+        <select id="fCat"><option value="">Todas las categorías</option></select>
+        <select id="fSort">
+          <option value="disc">Mayor descuento</option>
+          <option value="priceAsc">Menor precio</option>
+          <option value="priceDesc">Mayor precio</option>
+        </select>
+        <span class="count-chip" id="count">Cargando…</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- EVENT VIEW (default) -->
+    <section id="eventView">
+      <div class="hero" id="hero">
+        <div class="hero-head">
+          <div>
+            <h1>🔥 Ofertas del Día</h1>
+            <p>Las mejores rebajas de los supermercados de Chile, en un solo lugar.</p>
+          </div>
+        </div>
+        <div class="hero-grid" id="heroGrid"></div>
+      </div>
+      <div id="storeSections"></div>
+    </section>
+
+    <!-- RESULTS VIEW (search/filter) -->
+    <section id="resultsView" hidden>
+      <div class="results-head">
+        <div class="section-title" style="margin:18px 4px 0">
+          <span class="badge-bullet"></span>
+          <h2>Resultados</h2>
+        </div>
+        <div class="chips" id="activeChips"></div>
+      </div>
+      <div class="results-grid" id="resultsGrid"></div>
+      <button class="loadmore" id="loadMore" hidden>Ver más ofertas</button>
+      <div class="empty" id="emptyState" hidden>
+        <div class="big">🛒</div>
+        <h3>Sin resultados</h3>
+        <p>Prueba con otra palabra o quita algún filtro.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Precios referenciales capturados de cada tienda · Verifica siempre en el sitio oficial antes de comprar.<br>
+    OfertasYa Súper · Chile · 2026 — datos en CLP.
+  </footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Store color palette ----------
+  var STORE_COLORS = {
+    "Jumbo":"#1fa02e","Santa Isabel":"#d4213d","Unimarc":"#e31937","Tottus":"#e53935",
+    "Lider":"#0d6efd","Super10":"#f59e0b","Acuenta":"#0d47a1","Central Mayorista":"#7c3aed",
+    "Falabella":"#84bd00","Ripley":"#6b2d8b","Paris":"#111111","Hites":"#e2001a","La Polar":"#e6007e"
+  };
+  function storeColor(s){ return STORE_COLORS[s] || "#555"; }
+
+  // ---------- Helpers ----------
+  var fmt = function(n){ return "$" + Number(n||0).toLocaleString("es-CL"); };
+  function el(tag, cls){ var e=document.createElement(tag); if(cls) e.className=cls; return e; }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  // image error handler reference (set on window so inline attr can find it)
+  window.__imgErr = function(img){ var p=img.closest('.imgbox'); img.style.display='none'; if(p){p.style.background='#f0f1f6';} };
+
+  // ---------- State ----------
+  var ALL = [];
+  var FILTERED = [];
+  var BATCH = 300, rendered = 0;
+  var qEl = document.getElementById('q');
+  var fStore = document.getElementById('fStore');
+  var fCat = document.getElementById('fCat');
+  var fSort = document.getElementById('fSort');
+  var countEl = document.getElementById('count');
+  var eventView = document.getElementById('eventView');
+  var resultsView = document.getElementById('resultsView');
+  var resultsGrid = document.getElementById('resultsGrid');
+  var heroGrid = document.getElementById('heroGrid');
+  var storeSections = document.getElementById('storeSections');
+  var loadMoreBtn = document.getElementById('loadMore');
+  var emptyState = document.getElementById('emptyState');
+  var activeChips = document.getElementById('activeChips');
+
+  // ---------- Card builders ----------
+  function imgBox(item, discClass){
+    var box = el('div','imgbox');
+    if(discClass){
+      var d = el('div','disc'); d.textContent = "-"+ (item.descuento_pct||0) +"%"; box.appendChild(d);
+    }
+    if(item.imagen_url){
+      var img = new Image();
+      img.loading = "lazy"; img.alt = item.nombre_producto || "";
+      img.setAttribute('onerror','window.__imgErr(this)');
+      img.src = item.imagen_url;
+      box.appendChild(img);
+    }
+    return box;
+  }
+  function badge(item){
+    var b = el('span','store-badge');
+    b.style.background = storeColor(item.tienda);
+    b.textContent = item.tienda || "Tienda";
+    return b;
+  }
+  function priceBlock(item, nowCls){
+    var p = el('div','prices');
+    var now = el('span', nowCls||'now'); now.textContent = fmt(item.precio_oferta);
+    p.appendChild(now);
+    if(item.precio_original && item.precio_original > item.precio_oferta){
+      var was = el('span','was'); was.textContent = fmt(item.precio_original);
+      p.appendChild(was);
+    }
+    return p;
+  }
+  function ppuLine(item){
+    if(item.precio_por_unidad && item.precio_por_unidad>0){
+      var u = el('div','ppu'); u.textContent = fmt(item.precio_por_unidad) + " / " + (item.unidad||"un");
+      return u;
+    }
+    return null;
+  }
+  function linkWrap(item, node){
+    var a = el('a');
+    a.href = item.url_producto || "#";
+    a.target = "_blank"; a.rel = "noopener";
+    a.appendChild(node);
+    return a;
+  }
+
+  // Big hero card
+  function heroCard(item){
+    var c = el('div','hero-card');
+    var pct = el('div','pct');
+    var b = el('b'); b.textContent = (item.descuento_pct||0);
+    var sp = el('span'); sp.textContent = "% OFF";
+    pct.appendChild(b); pct.appendChild(sp); c.appendChild(pct);
+    c.appendChild(imgBox(item,false));
+    var body = el('div','body');
+    body.appendChild(badge(item));
+    var name = el('div','name'); name.textContent = item.nombre_producto || ""; body.appendChild(name);
+    var meta = el('div','meta-row');
+    var brand = el('span','brand-txt'); brand.textContent = (item.marca||"").toLowerCase(); meta.appendChild(brand);
+    body.appendChild(meta);
+    body.appendChild(priceBlock(item));
+    c.appendChild(body);
+    return linkWrap(item,c);
+  }
+
+  // Carousel product card
+  function carouselCard(item){
+    var c = el('div','pcard');
+    c.appendChild(imgBox(item,true));
+    var body = el('div','body');
+    body.appendChild(badge(item));
+    var name = el('div','name'); name.textContent = item.nombre_producto || ""; body.appendChild(name);
+    var brand = el('span','brand-txt'); brand.textContent = (item.marca||"").toLowerCase(); body.appendChild(brand);
+    body.appendChild(priceBlock(item));
+    var ppu = ppuLine(item); if(ppu) body.appendChild(ppu);
+    c.appendChild(body);
+    return linkWrap(item,c);
+  }
+
+  // Grid result card
+  function gridCard(item){
+    var c = el('div','gcard');
+    c.appendChild(imgBox(item,true));
+    var body = el('div','body');
+    body.appendChild(badge(item));
+    var name = el('div','name'); name.textContent = item.nombre_producto || ""; body.appendChild(name);
+    var brand = el('span','brand-txt'); brand.textContent = (item.marca||"").toLowerCase(); body.appendChild(brand);
+    body.appendChild(priceBlock(item));
+    var ppu = ppuLine(item); if(ppu) body.appendChild(ppu);
+    c.appendChild(body);
+    return linkWrap(item,c);
+  }
+
+  // ---------- Filtering / sorting ----------
+  function applySort(arr, mode){
+    var a = arr.slice();
+    if(mode === 'priceAsc') a.sort(function(x,y){ return (x.precio_oferta||0)-(y.precio_oferta||0); });
+    else if(mode === 'priceDesc') a.sort(function(x,y){ return (y.precio_oferta||0)-(x.precio_oferta||0); });
+    else a.sort(function(x,y){ return (y.descuento_pct||0)-(x.descuento_pct||0); });
+    return a;
+  }
+  function isEventMode(){
+    return !qEl.value.trim() && !fStore.value && !fCat.value;
+  }
+  function computeFiltered(){
+    var q = qEl.value.trim().toLowerCase();
+    var st = fStore.value, ct = fCat.value;
+    var out = [];
+    for(var i=0;i<ALL.length;i++){
+      var it = ALL[i];
+      if(st && it.tienda !== st) continue;
+      if(ct && it.categoria !== ct) continue;
+      if(q){
+        var hay = ((it.nombre_producto||"")+" "+(it.marca||"")).toLowerCase();
+        if(hay.indexOf(q) === -1) continue;
+      }
+      out.push(it);
+    }
+    FILTERED = applySort(out, fSort.value);
+  }
+
+  // ---------- Render: event (hero + carousels) ----------
+  function renderEvent(){
+    eventView.hidden = false;
+    resultsView.hidden = true;
+    activeChips.innerHTML = "";
+
+    var sorted = applySort(ALL, fSort.value === 'disc' ? 'disc' : fSort.value);
+    // Hero: top by discount always (most attractive)
+    var topDisc = applySort(ALL,'disc');
+    heroGrid.innerHTML = "";
+    var heroN = Math.min(6, topDisc.length);
+    var hf = document.createDocumentFragment();
+    for(var i=0;i<heroN;i++){ hf.appendChild(heroCard(topDisc[i])); }
+    heroGrid.appendChild(hf);
+
+    // Group by store
+    var groups = {};
+    for(var j=0;j<ALL.length;j++){
+      var t = ALL[j].tienda || "Otros";
+      (groups[t] = groups[t] || []).push(ALL[j]);
+    }
+    var storeNames = Object.keys(groups).sort(function(a,b){ return groups[b].length - groups[a].length; });
+
+    storeSections.innerHTML = "";
+    var frag = document.createDocumentFragment();
+    storeNames.forEach(function(name){
+      var items = applySort(groups[name],'disc').slice(0,24); // cap per carousel for perf
+      if(!items.length) return;
+
+      var block = el('div','carousel-block');
+      var st = el('div','section-title');
+      var bullet = el('span','badge-bullet'); bullet.style.background = storeColor(name); st.appendChild(bullet);
+      var h2 = el('h2'); h2.textContent = name; st.appendChild(h2);
+      var hint = el('span','hint'); hint.textContent = groups[name].length.toLocaleString("es-CL") + " ofertas"; st.appendChild(hint);
+      block.appendChild(st);
+
+      var wrap = el('div','carousel-wrap');
+      var car = el('div','carousel');
+      var cf = document.createDocumentFragment();
+      items.forEach(function(it){ cf.appendChild(carouselCard(it)); });
+      car.appendChild(cf);
+
+      var left = el('button','arrow left'); left.textContent='‹'; left.setAttribute('aria-label','Anterior');
+      var right = el('button','arrow right'); right.textContent='›'; right.setAttribute('aria-label','Siguiente');
+      left.addEventListener('click', function(){ car.scrollBy({left:-car.clientWidth*0.8, behavior:'smooth'}); });
+      right.addEventListener('click', function(){ car.scrollBy({left:car.clientWidth*0.8, behavior:'smooth'}); });
+
+      wrap.appendChild(left); wrap.appendChild(car); wrap.appendChild(right);
+      block.appendChild(wrap);
+      frag.appendChild(block);
+    });
+    storeSections.appendChild(frag);
+
+    countEl.textContent = ALL.length.toLocaleString("es-CL") + " ofertas activas";
+  }
+
+  // ---------- Render: results grid (batched) ----------
+  function renderResultsReset(){
+    eventView.hidden = true;
+    resultsView.hidden = false;
+    resultsGrid.innerHTML = "";
+    rendered = 0;
+    computeFiltered();
+
+    countEl.textContent = FILTERED.length.toLocaleString("es-CL") + (FILTERED.length===1?" resultado":" resultados");
+    buildChips();
+
+    if(FILTERED.length === 0){
+      emptyState.hidden = false;
+      loadMoreBtn.hidden = true;
+      return;
+    }
+    emptyState.hidden = true;
+    renderNextBatch();
+  }
+  function renderNextBatch(){
+    var end = Math.min(rendered + BATCH, FILTERED.length);
+    var frag = document.createDocumentFragment();
+    for(var i=rendered;i<end;i++){ frag.appendChild(gridCard(FILTERED[i])); }
+    resultsGrid.appendChild(frag);
+    rendered = end;
+    loadMoreBtn.hidden = rendered >= FILTERED.length;
+    if(!loadMoreBtn.hidden){
+      loadMoreBtn.textContent = "Ver más ofertas (" + (FILTERED.length - rendered).toLocaleString("es-CL") + " restantes)";
+    }
+  }
+  function buildChips(){
+    activeChips.innerHTML = "";
+    function chip(label, clear){
+      var c = el('span','fchip'); c.appendChild(document.createTextNode(label));
+      var b = el('button'); b.textContent="×"; b.title="Quitar"; b.addEventListener('click',clear);
+      c.appendChild(b); activeChips.appendChild(c);
+    }
+    if(qEl.value.trim()) chip('“'+qEl.value.trim()+'”', function(){ qEl.value=""; route(); });
+    if(fStore.value) chip(fStore.value, function(){ fStore.value=""; route(); });
+    if(fCat.value) chip(fCat.value, function(){ fCat.value=""; route(); });
+  }
+
+  // ---------- Router ----------
+  function route(){
+    if(isEventMode()) renderEvent();
+    else renderResultsReset();
+  }
+
+  // ---------- Debounce ----------
+  function debounce(fn, ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn, ms); }; }
+
+  // ---------- Init / fetch ----------
+  function populateFilters(){
+    var stores = {}, cats = {};
+    for(var i=0;i<ALL.length;i++){
+      var s = ALL[i].tienda, c = ALL[i].categoria;
+      if(s) stores[s]=(stores[s]||0)+1;
+      if(c) cats[c]=(cats[c]||0)+1;
+    }
+    var sNames = Object.keys(stores).sort(function(a,b){ return stores[b]-stores[a]; });
+    var cNames = Object.keys(cats).sort();
+    sNames.forEach(function(n){ var o=el('option'); o.value=n; o.textContent=n+" ("+stores[n].toLocaleString("es-CL")+")"; fStore.appendChild(o); });
+    cNames.forEach(function(n){ var o=el('option'); o.value=n; o.textContent=n; fCat.appendChild(o); });
+  }
+
+  function showLoading(){
+    heroGrid.innerHTML="";
+    for(var i=0;i<6;i++){ var s=el('div','skeleton'); heroGrid.appendChild(s); }
+    countEl.textContent = "Cargando…";
+  }
+
+  function boot(data){
+    if(!Array.isArray(data)) data = [];
+    // sanitize numbers
+    ALL = data.map(function(d){
+      return {
+        tienda:d.tienda, categoria:d.categoria, marca:d.marca, nombre_producto:d.nombre_producto,
+        precio_original:+d.precio_original||0, precio_oferta:+d.precio_oferta||0,
+        descuento_pct:+d.descuento_pct||0, precio_por_unidad:+d.precio_por_unidad||0,
+        unidad:d.unidad, sku:d.sku, url_producto:d.url_producto, imagen_url:d.imagen_url, fecha_captura:d.fecha_captura
+      };
+    });
+    populateFilters();
+    route();
+
+    qEl.addEventListener('input', debounce(route, 220));
+    fStore.addEventListener('change', route);
+    fCat.addEventListener('change', route);
+    fSort.addEventListener('change', route);
+    loadMoreBtn.addEventListener('click', renderNextBatch);
+  }
+
+  function renderError(msg){
+    eventView.hidden = true; resultsView.hidden = false;
+    resultsGrid.innerHTML = "";
+    emptyState.hidden = false;
+    emptyState.querySelector('h3').textContent = "No se pudieron cargar las ofertas";
+    emptyState.querySelector('p').textContent = msg || "Intenta recargar la página.";
+    countEl.textContent = "—";
+  }
+
+  showLoading();
+  fetch("/api/ofertas")
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(boot)
+    .catch(function(err){ renderError(String(err && err.message || err)); });
+
+})();
+</script>
+</body>
+</html>

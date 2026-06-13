@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalogo de Ofertas - Supermercados Chile</title>
+<style>
+  :root{
+    --bg:#fbf6ee;
+    --paper:#ffffff;
+    --ink:#2b2118;
+    --ink-soft:#6b5d4f;
+    --accent:#e8420c;
+    --accent-2:#ffb703;
+    --line:#ece2d4;
+    --shadow:0 6px 22px rgba(80,55,20,.10);
+    --shadow-lg:0 14px 40px rgba(80,55,20,.16);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    padding-top:44px;
+    background:
+      radial-gradient(1200px 600px at 80% -100px, #fff3df 0%, rgba(255,243,223,0) 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.4;
+  }
+  a{color:inherit;text-decoration:none}
+  img{display:block}
+
+  /* ===== Cabecera tipo portada de folleto ===== */
+  .cover{
+    position:relative;
+    margin:0 auto;
+    max-width:1280px;
+    padding:26px 20px 10px;
+  }
+  .cover-band{
+    background:linear-gradient(115deg,#e8420c 0%, #ff6b1f 55%, #ffb703 130%);
+    color:#fff;
+    border-radius:22px;
+    padding:22px 26px;
+    box-shadow:var(--shadow-lg);
+    position:relative;
+    overflow:hidden;
+  }
+  .cover-band::after{
+    content:"";
+    position:absolute;right:-60px;top:-60px;
+    width:240px;height:240px;border-radius:50%;
+    background:rgba(255,255,255,.12);
+  }
+  .cover-kicker{
+    font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    font-weight:700;opacity:.92;margin:0 0 4px;
+  }
+  .cover-title{
+    margin:0;font-size:clamp(26px,4.6vw,44px);font-weight:900;
+    letter-spacing:-.5px;line-height:1.02;
+    text-shadow:0 2px 0 rgba(0,0,0,.08);
+  }
+  .cover-title b{color:#fff2b0}
+  .cover-sub{margin:8px 0 0;font-size:14px;opacity:.95;max-width:640px}
+  .cover-stamp{
+    position:absolute;right:24px;bottom:18px;
+    background:#fff;color:var(--accent);
+    font-weight:900;font-size:13px;letter-spacing:.04em;
+    padding:8px 14px;border-radius:999px;
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+    transform:rotate(-6deg);
+  }
+  @media (max-width:620px){ .cover-stamp{display:none} }
+
+  /* ===== Barra de controles (sticky) ===== */
+  .toolbar-wrap{
+    position:sticky;top:44px;z-index:30;
+    background:rgba(251,246,238,.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .toolbar{
+    max-width:1280px;margin:0 auto;
+    padding:12px 20px;
+    display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  }
+  .search{
+    flex:1 1 260px;min-width:200px;position:relative;
+  }
+  .search input{
+    width:100%;border:2px solid var(--line);background:var(--paper);
+    padding:11px 14px 11px 40px;border-radius:12px;font-size:15px;color:var(--ink);
+    outline:none;transition:border-color .15s, box-shadow .15s;
+  }
+  .search input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(232,66,12,.12)}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5}
+  select{
+    appearance:none;-webkit-appearance:none;
+    border:2px solid var(--line);background:var(--paper);
+    padding:11px 34px 11px 14px;border-radius:12px;font-size:14px;color:var(--ink);
+    cursor:pointer;font-weight:600;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b5d4f' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;
+    transition:border-color .15s;
+  }
+  select:focus{outline:none;border-color:var(--accent)}
+  .count-pill{
+    margin-left:auto;font-size:13px;font-weight:700;color:var(--ink-soft);
+    background:#fff;border:1px solid var(--line);border-radius:999px;
+    padding:8px 14px;white-space:nowrap;
+  }
+  .count-pill b{color:var(--accent)}
+
+  /* ===== Cuerpo ===== */
+  main{max-width:1280px;margin:0 auto;padding:6px 16px 60px}
+
+  .section-head{
+    display:flex;align-items:center;gap:14px;
+    margin:30px 4px 14px;
+  }
+  .section-head h2{
+    margin:0;font-size:clamp(20px,3vw,30px);font-weight:900;
+    letter-spacing:-.4px;color:var(--ink);text-transform:capitalize;
+    position:relative;white-space:nowrap;
+  }
+  .section-head .tag{
+    background:var(--ink);color:#fff;font-size:11px;font-weight:800;
+    letter-spacing:.06em;text-transform:uppercase;
+    padding:5px 10px;border-radius:8px;
+  }
+  .section-head .rule{
+    flex:1;height:3px;border-radius:3px;
+    background:repeating-linear-gradient(90deg,var(--accent-2) 0 14px,transparent 14px 22px);
+    opacity:.7;
+  }
+  .section-count{font-size:13px;color:var(--ink-soft);font-weight:700;white-space:nowrap}
+
+  /* ===== Mosaico masonry ===== */
+  .mosaic{
+    column-count:5;
+    column-gap:16px;
+  }
+  @media (max-width:1180px){ .mosaic{column-count:4} }
+  @media (max-width:920px){ .mosaic{column-count:3} }
+  @media (max-width:640px){ .mosaic{column-count:2; column-gap:12px} }
+  @media (max-width:380px){ .mosaic{column-count:1} }
+
+  .card{
+    break-inside:avoid;
+    -webkit-column-break-inside:avoid;
+    page-break-inside:avoid;
+    background:var(--paper);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    margin:0 0 16px;
+    overflow:hidden;
+    border:1px solid #f1e9dc;
+    transition:transform .16s ease, box-shadow .16s ease;
+    position:relative;
+    display:block;
+  }
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+
+  .card .imgwrap{
+    position:relative;background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    padding:10px;
+  }
+  .card .imgwrap img{
+    width:100%;height:auto;object-fit:contain;border-radius:8px;
+  }
+  /* tarjetas destacadas (gran descuento) muestran imagen mas grande */
+  .card.big .imgwrap{min-height:180px}
+  .card.huge .imgwrap{min-height:220px}
+
+  .badge-store{
+    position:absolute;left:10px;top:10px;
+    color:#fff;font-size:11px;font-weight:800;letter-spacing:.03em;
+    padding:5px 10px;border-radius:8px;
+    box-shadow:0 2px 6px rgba(0,0,0,.2);
+    text-transform:uppercase;
+  }
+  .badge-disc{
+    position:absolute;right:10px;top:10px;
+    background:var(--accent);color:#fff;
+    font-weight:900;font-size:15px;line-height:1;
+    width:46px;height:46px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;
+    box-shadow:0 4px 10px rgba(232,66,12,.4);
+    transform:rotate(8deg);
+    border:2px solid #fff;
+  }
+  .card.huge .badge-disc{width:58px;height:58px;font-size:19px}
+  .badge-disc small{font-size:8px;font-weight:700;opacity:.9;margin-top:1px}
+
+  .card .body{padding:12px 14px 14px}
+  .card .marca{
+    font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--ink-soft);margin:0 0 3px;
+  }
+  .card .nombre{
+    font-size:14px;font-weight:600;color:var(--ink);
+    margin:0 0 10px;line-height:1.25;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    min-height:35px;
+  }
+  .card.huge .nombre{font-size:16px}
+  .price-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .price-now{
+    font-size:22px;font-weight:900;color:var(--accent);letter-spacing:-.5px;
+  }
+  .card.huge .price-now{font-size:27px}
+  .price-old{
+    font-size:13px;color:var(--ink-soft);text-decoration:line-through;font-weight:600;
+  }
+  .ppu{
+    margin-top:6px;font-size:11px;color:var(--ink-soft);
+    background:#f7f0e4;border-radius:6px;padding:3px 8px;display:inline-block;font-weight:600;
+  }
+
+  /* ===== Boton ver mas / sentinel ===== */
+  .more-wrap{text-align:center;padding:34px 0 10px}
+  .btn-more{
+    background:var(--accent);color:#fff;border:none;
+    font-size:15px;font-weight:800;letter-spacing:.02em;
+    padding:14px 30px;border-radius:999px;cursor:pointer;
+    box-shadow:0 8px 20px rgba(232,66,12,.32);
+    transition:transform .12s, box-shadow .12s, background .12s;
+  }
+  .btn-more:hover{background:#cf3909;transform:translateY(-2px)}
+  .btn-more:active{transform:translateY(0)}
+  .loading{font-size:13px;color:var(--ink-soft);padding:20px;text-align:center}
+
+  .empty{
+    text-align:center;padding:70px 20px;color:var(--ink-soft);
+  }
+  .empty .em-emoji{font-size:48px;margin-bottom:10px}
+  .empty h3{margin:0 0 6px;color:var(--ink);font-size:20px}
+
+  .skeleton{
+    background:linear-gradient(90deg,#f2ead d 0%, #f7f0e4 50%, #f2eadd 100%);
+  }
+  .footer-note{
+    max-width:1280px;margin:10px auto 0;padding:20px;
+    text-align:center;font-size:12px;color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+  <header class="cover">
+    <div class="cover-band">
+      <p class="cover-kicker">Folleto de ofertas - Chile</p>
+      <h1 class="cover-title">Las mejores <b>ofertas</b> de la semana</h1>
+      <p class="cover-sub">Compara precios de Jumbo, Santa Isabel, Unimarc, Tottus, Lider y mas. Productos agrupados por categoria, con los mayores descuentos destacados.</p>
+      <div class="cover-stamp" id="coverStamp">Cargando...</div>
+    </div>
+  </header>
+
+  <div class="toolbar-wrap">
+    <div class="toolbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="Buscar producto o marca..." autocomplete="off">
+      </div>
+      <select id="fTienda"><option value="">Todas las tiendas</option></select>
+      <select id="fCategoria"><option value="">Todas las categorias</option></select>
+      <select id="fOrden">
+        <option value="desc">Mayor descuento</option>
+        <option value="precio_asc">Menor precio</option>
+        <option value="precio_desc">Mayor precio</option>
+      </select>
+      <span class="count-pill" id="count">Cargando ofertas...</span>
+    </div>
+  </div>
+
+  <main>
+    <div id="sections"></div>
+    <div class="more-wrap" id="moreWrap" style="display:none">
+      <button class="btn-more" id="btnMore">Ver mas ofertas</button>
+    </div>
+    <div id="status" class="loading">Cargando ofertas...</div>
+  </main>
+
+  <div class="footer-note">
+    Precios referenciales capturados de cada tienda. Verifica el precio final en el sitio oficial antes de comprar.
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- Paleta por tienda ----
+  var STORE_COLORS = {
+    "Jumbo":"#1fa02e","Santa Isabel":"#d4213d","Unimarc":"#e31937",
+    "Tottus":"#e53935","Lider":"#0d6efd","Super10":"#f59e0b","Acuenta":"#0d47a1",
+    "Central Mayorista":"#7c3aed","Falabella":"#84bd00","Ripley":"#6b2d8b",
+    "Paris":"#111111","Hites":"#e2001a","La Polar":"#e6007e"
+  };
+  function storeColor(t){ return STORE_COLORS[t] || "#555"; }
+
+  var CLP = function(n){
+    n = Number(n)||0;
+    return "$" + n.toLocaleString("es-CL");
+  };
+  function esc(s){
+    return String(s==null?"":s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;");
+  }
+
+  // ---- Estado ----
+  var ALL = [];          // todos los items
+  var FILTERED = [];     // tras filtros/orden, ordenados ya agrupados por categoria
+  var GROUPS = [];       // [{categoria, items:[...]}], ya recortado por orden global
+  var BATCH = 300;       // items por lote
+  var shown = 0;         // cuantos items renderizados (sobre FILTERED plano)
+  var FLAT = [];         // lista plana ordenada por categoria respetando orden global
+
+  var elSections = document.getElementById("sections");
+  var elStatus = document.getElementById("status");
+  var elCount = document.getElementById("count");
+  var elMoreWrap = document.getElementById("moreWrap");
+  var elBtnMore = document.getElementById("btnMore");
+  var elStamp = document.getElementById("coverStamp");
+
+  var qInput = document.getElementById("q");
+  var fTienda = document.getElementById("fTienda");
+  var fCategoria = document.getElementById("fCategoria");
+  var fOrden = document.getElementById("fOrden");
+
+  // ---- Fetch ----
+  fetch("/api/ofertas")
+    .then(function(r){
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return r.json();
+    })
+    .then(function(data){
+      ALL = Array.isArray(data) ? data : [];
+      init();
+    })
+    .catch(function(err){
+      elStatus.innerHTML = '<div class="empty"><div class="em-emoji">&#128533;</div><h3>No se pudieron cargar las ofertas</h3><div>Intenta recargar la pagina. (' + esc(err.message) + ')</div></div>';
+      elCount.textContent = "Error";
+      elStamp.textContent = "—";
+    });
+
+  function init(){
+    // poblar selects
+    var tiendas = {}, cats = {};
+    for(var i=0;i<ALL.length;i++){
+      var it = ALL[i];
+      if(it.tienda) tiendas[it.tienda]=1;
+      if(it.categoria) cats[it.categoria]=1;
+    }
+    fillSelect(fTienda, Object.keys(tiendas).sort(collator()));
+    fillSelect(fCategoria, Object.keys(cats).sort(collator()));
+
+    elStamp.textContent = ALL.length.toLocaleString("es-CL") + " ofertas";
+
+    // listeners
+    var deb;
+    qInput.addEventListener("input", function(){
+      clearTimeout(deb); deb=setTimeout(apply, 180);
+    });
+    fTienda.addEventListener("change", apply);
+    fCategoria.addEventListener("change", apply);
+    fOrden.addEventListener("change", apply);
+    elBtnMore.addEventListener("click", renderNextBatch);
+
+    apply();
+    setupInfinite();
+  }
+
+  function collator(){
+    return function(a,b){ return a.localeCompare(b,"es",{sensitivity:"base"}); };
+  }
+
+  function fillSelect(sel, arr){
+    var frag = document.createDocumentFragment();
+    for(var i=0;i<arr.length;i++){
+      var o = document.createElement("option");
+      o.value = arr[i]; o.textContent = arr[i];
+      frag.appendChild(o);
+    }
+    sel.appendChild(frag);
+  }
+
+  // ---- Aplicar filtros + orden ----
+  function apply(){
+    var q = qInput.value.trim().toLowerCase();
+    var qt = q ? q.split(/\s+/) : [];
+    var ft = fTienda.value;
+    var fc = fCategoria.value;
+    var orden = fOrden.value;
+
+    var out = [];
+    for(var i=0;i<ALL.length;i++){
+      var it = ALL[i];
+      if(ft && it.tienda !== ft) continue;
+      if(fc && it.categoria !== fc) continue;
+      if(qt.length){
+        var hay = ((it.nombre_producto||"") + " " + (it.marca||"")).toLowerCase();
+        var ok = true;
+        for(var k=0;k<qt.length;k++){ if(hay.indexOf(qt[k])===-1){ ok=false; break; } }
+        if(!ok) continue;
+      }
+      out.push(it);
+    }
+
+    // ordenar globalmente segun criterio
+    out.sort(makeComparator(orden));
+
+    FILTERED = out;
+
+    // Agrupar por categoria respetando el orden global:
+    // recorremos out en orden; la primera aparicion de cada categoria
+    // fija el orden de las secciones, y dentro mantienen el orden global.
+    var map = {}, order = [];
+    for(var j=0;j<out.length;j++){
+      var c = out[j].categoria || "Otros";
+      if(!map[c]){ map[c]=[]; order.push(c); }
+      map[c].push(out[j]);
+    }
+    GROUPS = order.map(function(c){ return {categoria:c, items:map[c]}; });
+
+    // lista plana en orden de secciones (para lotes)
+    FLAT = [];
+    for(var g=0;g<GROUPS.length;g++){
+      var items = GROUPS[g].items;
+      for(var m=0;m<items.length;m++){ FLAT.push({grp:g, it:items[m]}); }
+    }
+
+    // reset render
+    elSections.innerHTML = "";
+    shown = 0;
+    renderedSections = {}; // limpiar referencias
+
+    elCount.innerHTML = "<b>" + FILTERED.length.toLocaleString("es-CL") + "</b> resultados";
+
+    if(FILTERED.length === 0){
+      elStatus.style.display = "none";
+      elMoreWrap.style.display = "none";
+      elSections.innerHTML = '<div class="empty"><div class="em-emoji">&#128269;</div><h3>Sin resultados</h3><div>Prueba con otra palabra o quita algun filtro.</div></div>';
+      return;
+    }
+    renderNextBatch();
+  }
+
+  function makeComparator(orden){
+    if(orden === "precio_asc") return function(a,b){ return (a.precio_oferta||0)-(b.precio_oferta||0); };
+    if(orden === "precio_desc") return function(a,b){ return (b.precio_oferta||0)-(a.precio_oferta||0); };
+    // default: mayor descuento
+    return function(a,b){ return (b.descuento_pct||0)-(a.descuento_pct||0); };
+  }
+
+  // ---- Render por lotes, manteniendo secciones ----
+  var renderedSections = {}; // grpIndex -> {mosaicEl}
+
+  function ensureSection(grpIndex){
+    if(renderedSections[grpIndex]) return renderedSections[grpIndex];
+    var g = GROUPS[grpIndex];
+    var sec = document.createElement("section");
+
+    var head = document.createElement("div");
+    head.className = "section-head";
+    head.innerHTML =
+      '<span class="tag">Seccion</span>' +
+      '<h2>' + esc(g.categoria) + '</h2>' +
+      '<span class="rule"></span>' +
+      '<span class="section-count">' + g.items.length.toLocaleString("es-CL") + ' productos</span>';
+
+    var mosaic = document.createElement("div");
+    mosaic.className = "mosaic";
+
+    sec.appendChild(head);
+    sec.appendChild(mosaic);
+    elSections.appendChild(sec);
+
+    var ref = {mosaic:mosaic, added:0, total:g.items.length};
+    renderedSections[grpIndex] = ref;
+    return ref;
+  }
+
+  function renderNextBatch(){
+    var end = Math.min(shown + BATCH, FLAT.length);
+    // agrupar por seccion los items de este lote para hacer 1 insercion por seccion
+    var bucket = {}; // grp -> html string
+    for(var i=shown;i<end;i++){
+      var entry = FLAT[i];
+      if(!bucket[entry.grp]) bucket[entry.grp] = "";
+      bucket[entry.grp] += cardHTML(entry.it);
+    }
+    for(var grp in bucket){
+      if(!bucket.hasOwnProperty(grp)) continue;
+      var ref = ensureSection(Number(grp));
+      ref.mosaic.insertAdjacentHTML("beforeend", bucket[grp]);
+    }
+    shown = end;
+
+    if(shown >= FLAT.length){
+      elMoreWrap.style.display = "none";
+      elStatus.style.display = "block";
+      elStatus.textContent = "Has visto las " + FILTERED.length.toLocaleString("es-CL") + " ofertas.";
+    } else {
+      elMoreWrap.style.display = "block";
+      elStatus.style.display = "none";
+      elBtnMore.textContent = "Ver mas ofertas (" + (FLAT.length - shown).toLocaleString("es-CL") + " restantes)";
+    }
+  }
+
+  function sizeClass(d){
+    if(d >= 50) return "huge";
+    if(d >= 35) return "big";
+    return "";
+  }
+
+  function cardHTML(it){
+    var color = storeColor(it.tienda);
+    var disc = Number(it.descuento_pct)||0;
+    var cls = sizeClass(disc);
+    var url = (it.url_producto && /^https?:\/\//i.test(it.url_producto)) ? it.url_producto : "#";
+    var img = it.imagen_url || "";
+
+    var discBadge = disc > 0
+      ? '<div class="badge-disc">-' + disc + '%<small>DCTO</small></div>'
+      : '';
+
+    var oldPrice = (Number(it.precio_original)||0) > (Number(it.precio_oferta)||0)
+      ? '<span class="price-old">' + CLP(it.precio_original) + '</span>'
+      : '';
+
+    var ppu = (Number(it.precio_por_unidad)||0) > 0
+      ? '<div class="ppu">' + CLP(it.precio_por_unidad) + ' / ' + esc(it.unidad||"un") + '</div>'
+      : '';
+
+    var imgHtml = img
+      ? '<img loading="lazy" src="' + esc(img) + '" alt="' + esc(it.nombre_producto) + '" onerror="this.style.display=\'none\'">'
+      : '';
+
+    return '' +
+      '<a class="card ' + cls + '" href="' + esc(url) + '" target="_blank" rel="noopener">' +
+        '<div class="imgwrap">' +
+          '<span class="badge-store" style="background:' + color + '">' + esc(it.tienda) + '</span>' +
+          discBadge +
+          imgHtml +
+        '</div>' +
+        '<div class="body">' +
+          '<p class="marca">' + esc(it.marca || "&nbsp;") + '</p>' +
+          '<p class="nombre">' + esc(it.nombre_producto) + '</p>' +
+          '<div class="price-row">' +
+            '<span class="price-now">' + CLP(it.precio_oferta) + '</span>' +
+            oldPrice +
+          '</div>' +
+          ppu +
+        '</div>' +
+      '</a>';
+  }
+
+  // ---- Scroll infinito (complementa el boton) ----
+  function setupInfinite(){
+    if(!("IntersectionObserver" in window)) return;
+    var io = new IntersectionObserver(function(entries){
+      for(var i=0;i<entries.length;i++){
+        if(entries[i].isIntersecting && shown < FLAT.length && FILTERED.length>0){
+          renderNextBatch();
+        }
+      }
+    }, {rootMargin:"600px 0px"});
+    io.observe(elMoreWrap);
+  }
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+[
+  { "name": "dashboard-sidebar", "title": "Dashboard (principal)" },
+  { "name": "grid-ecommerce", "title": "Grilla E-commerce" },
+  { "name": "comparador-tabla", "title": "Comparador" },
+  { "name": "deals-hero", "title": "Ofertas del día" },
+  { "name": "catalogo-folleto", "title": "Catálogo" }
+]

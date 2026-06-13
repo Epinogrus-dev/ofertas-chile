@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ofertas Supermercados Chile</title>
+<style>
+  :root{
+    --bg:#f4f5f7;
+    --card:#ffffff;
+    --txt:#2d3436;
+    --muted:#8a939b;
+    --line:#e8eaed;
+    --green:#1fa02e;
+    --red:#e53935;
+    --shadow:0 1px 3px rgba(0,0,0,.08);
+    --shadow-hover:0 10px 28px rgba(0,0,0,.16);
+    --radius:12px;
+    --bar-h:44px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--txt);
+    padding-top:var(--bar-h);
+    line-height:1.4;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ===== Hero ===== */
+  .hero{
+    background:linear-gradient(120deg,#1fa02e 0%,#13862a 100%);
+    color:#fff;
+    padding:22px 20px 18px;
+  }
+  .hero-in{max-width:1280px;margin:0 auto}
+  .hero h1{font-size:24px;font-weight:800;letter-spacing:-.4px;display:flex;align-items:center;gap:10px}
+  .hero h1 .cart{font-size:26px}
+  .hero p{font-size:13.5px;opacity:.92;margin-top:4px}
+
+  /* ===== Filtros sticky ===== */
+  .filters{
+    position:sticky;
+    top:var(--bar-h);
+    z-index:50;
+    background:rgba(255,255,255,.96);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 2px 10px rgba(0,0,0,.04);
+  }
+  .filters-in{
+    max-width:1280px;margin:0 auto;
+    padding:12px 20px;
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  }
+  .search-wrap{position:relative;flex:1 1 280px;min-width:200px}
+  .search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:17px;height:17px;fill:var(--muted)}
+  input[type="search"]{
+    width:100%;
+    padding:11px 14px 11px 36px;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    font-size:14px;
+    background:#fff;
+    outline:none;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  input[type="search"]:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(31,160,46,.13)}
+  select{
+    padding:11px 32px 11px 12px;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    font-size:13.5px;
+    background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%238a939b'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 10px center;
+    appearance:none;-webkit-appearance:none;
+    cursor:pointer;color:var(--txt);
+    outline:none;
+    transition:border-color .15s;
+    flex:0 1 auto;min-width:140px;
+  }
+  select:focus{border-color:var(--green)}
+
+  /* ===== Resultados ===== */
+  .meta{
+    max-width:1280px;margin:0 auto;
+    padding:16px 20px 4px;
+    display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+  }
+  .meta .count{font-size:15px;font-weight:700}
+  .meta .count b{color:var(--green)}
+  .meta .sub{font-size:12.5px;color:var(--muted)}
+  .meta .clear{
+    margin-left:auto;font-size:12.5px;color:var(--green);
+    background:none;border:none;cursor:pointer;font-weight:600;text-decoration:underline;
+  }
+
+  /* ===== Grid ===== */
+  .grid{
+    max-width:1280px;margin:0 auto;
+    padding:14px 20px 40px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(218px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    box-shadow:var(--shadow);
+    transition:transform .18s ease,box-shadow .18s ease;
+    position:relative;
+    text-decoration:none;color:inherit;
+  }
+  .card:hover{transform:translateY(-5px);box-shadow:var(--shadow-hover)}
+
+  .card-img{
+    position:relative;
+    aspect-ratio:1/1;
+    background:#fafbfc;
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+  }
+  .card-img img{width:100%;height:100%;object-fit:contain;padding:10px;transition:transform .25s}
+  .card:hover .card-img img{transform:scale(1.04)}
+  .card-img .ph{font-size:40px;opacity:.18}
+
+  .badge-disc{
+    position:absolute;top:10px;left:10px;
+    background:var(--red);color:#fff;
+    font-size:13px;font-weight:800;
+    padding:4px 9px;border-radius:8px;
+    box-shadow:0 2px 6px rgba(229,57,53,.35);
+    letter-spacing:-.3px;
+  }
+  .badge-store{
+    position:absolute;top:10px;right:10px;
+    color:#fff;font-size:10.5px;font-weight:700;
+    padding:3px 8px;border-radius:20px;
+    box-shadow:0 1px 4px rgba(0,0,0,.2);
+    max-width:62%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+
+  .card-body{padding:11px 12px 13px;display:flex;flex-direction:column;flex:1}
+  .brand{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:3px}
+  .name{
+    font-size:13px;color:var(--txt);font-weight:500;line-height:1.32;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    min-height:34px;margin-bottom:8px;
+  }
+  .price-row{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-top:auto}
+  .price-now{font-size:20px;font-weight:800;color:var(--green);letter-spacing:-.5px}
+  .price-old{font-size:12.5px;color:var(--muted);text-decoration:line-through}
+  .unit{font-size:11px;color:var(--muted);margin-top:4px}
+  .cat-tag{
+    margin-top:8px;display:inline-block;align-self:flex-start;
+    font-size:10.5px;color:#5a6573;background:#f0f2f5;
+    padding:2px 8px;border-radius:6px;
+  }
+
+  /* ===== Ver mas / estados ===== */
+  .more-wrap{text-align:center;padding:6px 20px 50px}
+  .btn-more{
+    background:var(--green);color:#fff;border:none;
+    padding:13px 34px;border-radius:30px;font-size:14.5px;font-weight:700;
+    cursor:pointer;box-shadow:0 4px 14px rgba(31,160,46,.3);
+    transition:transform .15s,box-shadow .15s,background .15s;
+  }
+  .btn-more:hover{background:#178a28;transform:translateY(-2px);box-shadow:0 7px 20px rgba(31,160,46,.38)}
+  .btn-more:active{transform:translateY(0)}
+
+  .empty,.loading{
+    max-width:1280px;margin:0 auto;text-align:center;
+    padding:70px 20px;color:var(--muted);
+  }
+  .empty .ico,.loading .ico{font-size:48px;margin-bottom:12px;opacity:.5}
+  .empty h3{color:var(--txt);font-size:17px;margin-bottom:6px}
+
+  .spinner{
+    width:38px;height:38px;border:4px solid var(--line);border-top-color:var(--green);
+    border-radius:50%;margin:0 auto 16px;animation:spin .8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* skeleton */
+  .skel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .skel .s-img{aspect-ratio:1/1;background:linear-gradient(90deg,#eee,#f6f6f6,#eee);background-size:200% 100%;animation:sh 1.3s infinite}
+  .skel .s-line{height:11px;margin:9px 12px;border-radius:5px;background:linear-gradient(90deg,#eee,#f6f6f6,#eee);background-size:200% 100%;animation:sh 1.3s infinite}
+  .skel .s-line.w60{width:60%}
+  .skel .s-line.w40{width:40%}
+  @keyframes sh{to{background-position:-200% 0}}
+
+  @media(max-width:560px){
+    .hero h1{font-size:20px}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px;padding:12px 12px 36px}
+    .filters-in{padding:10px 12px}
+    .meta{padding:12px 12px 2px}
+    .price-now{font-size:17px}
+    .name{font-size:12px;min-height:31px}
+    select{flex:1 1 calc(50% - 5px);min-width:0}
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero-in">
+      <h1><span class="cart">&#128722;</span> Ofertas Supermercados Chile</h1>
+      <p>Compara descuentos de Jumbo, Lider, Unimarc, Tottus y mas. Encuentra el mejor precio.</p>
+    </div>
+  </header>
+
+  <div class="filters">
+    <div class="filters-in">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.49 4.49 0 0 1 9.5 14z"/></svg>
+        <input type="search" id="q" placeholder="Buscar por producto o marca..." autocomplete="off">
+      </div>
+      <select id="store"><option value="">Todas las tiendas</option></select>
+      <select id="cat"><option value="">Todas las categorias</option></select>
+      <select id="sort">
+        <option value="disc">Mayor descuento</option>
+        <option value="priceAsc">Menor precio</option>
+        <option value="priceDesc">Mayor precio</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="meta" id="meta" hidden>
+    <span class="count" id="count"></span>
+    <span class="sub" id="sub"></span>
+    <button class="clear" id="clear" hidden>Limpiar filtros</button>
+  </div>
+
+  <main>
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <div>Cargando ofertas...</div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden>
+      <div class="ico">&#128269;</div>
+      <h3>Sin resultados</h3>
+      <div>No encontramos ofertas con esos filtros. Prueba con otra busqueda.</div>
+    </div>
+  </main>
+
+  <div class="more-wrap">
+    <button class="btn-more" id="more" hidden>Ver mas ofertas</button>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORE_COLORS = {
+    "Jumbo":"#1fa02e","Santa Isabel":"#d4213d","Unimarc":"#e31937","Tottus":"#e53935",
+    "Lider":"#0d6efd","Super10":"#f59e0b","Acuenta":"#0d47a1","Central Mayorista":"#7c3aed",
+    "Falabella":"#84bd00","Ripley":"#6b2d8b","Paris":"#111111","Hites":"#e2001a","La Polar":"#e6007e"
+  };
+  var DEFAULT_COLOR = "#555";
+  var BATCH = 300;
+
+  var grid = document.getElementById("grid");
+  var loadingEl = document.getElementById("loading");
+  var emptyEl = document.getElementById("empty");
+  var moreBtn = document.getElementById("more");
+  var metaEl = document.getElementById("meta");
+  var countEl = document.getElementById("count");
+  var subEl = document.getElementById("sub");
+  var clearBtn = document.getElementById("clear");
+  var qEl = document.getElementById("q");
+  var storeEl = document.getElementById("store");
+  var catEl = document.getElementById("cat");
+  var sortEl = document.getElementById("sort");
+
+  var ALL = [];
+  var filtered = [];
+  var rendered = 0;
+
+  function clp(n){
+    n = Number(n);
+    if(!isFinite(n)) n = 0;
+    return "$" + n.toLocaleString("es-CL");
+  }
+  function esc(s){
+    return String(s==null?"":s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;");
+  }
+  function colorFor(store){ return STORE_COLORS[store] || DEFAULT_COLOR; }
+
+  function debounce(fn,ms){
+    var t; return function(){ var a=arguments,c=this; clearTimeout(t); t=setTimeout(function(){fn.apply(c,a)},ms); };
+  }
+
+  // ---- Carga ----
+  fetch("/api/ofertas")
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(function(data){
+      ALL = Array.isArray(data) ? data : [];
+      loadingEl.hidden = true;
+      buildFilters();
+      apply();
+    })
+    .catch(function(err){
+      loadingEl.innerHTML =
+        '<div class="ico">&#9888;</div><h3 style="color:#2d3436">No se pudieron cargar las ofertas</h3>'+
+        '<div>'+esc(err.message)+'</div>';
+    });
+
+  function buildFilters(){
+    var stores = {}, cats = {};
+    for(var i=0;i<ALL.length;i++){
+      var s = ALL[i].tienda, c = ALL[i].categoria;
+      if(s) stores[s] = (stores[s]||0)+1;
+      if(c) cats[c] = (cats[c]||0)+1;
+    }
+    fillSelect(storeEl, stores, "Todas las tiendas");
+    fillSelect(catEl, cats, "Todas las categorias");
+  }
+  function fillSelect(sel, map, allLabel){
+    var keys = Object.keys(map).sort(function(a,b){ return a.localeCompare(b,"es"); });
+    var html = '<option value="">'+allLabel+'</option>';
+    for(var i=0;i<keys.length;i++){
+      html += '<option value="'+esc(keys[i])+'">'+esc(keys[i])+' ('+map[keys[i]]+')</option>';
+    }
+    sel.innerHTML = html;
+  }
+
+  // ---- Filtrado + orden ----
+  function apply(){
+    var q = qEl.value.trim().toLowerCase();
+    var store = storeEl.value;
+    var cat = catEl.value;
+    var sort = sortEl.value;
+
+    var out = [];
+    for(var i=0;i<ALL.length;i++){
+      var it = ALL[i];
+      if(store && it.tienda !== store) continue;
+      if(cat && it.categoria !== cat) continue;
+      if(q){
+        var hay = ((it.nombre_producto||"")+" "+(it.marca||"")).toLowerCase();
+        if(hay.indexOf(q) === -1) continue;
+      }
+      out.push(it);
+    }
+
+    if(sort === "disc"){
+      out.sort(function(a,b){ return (b.descuento_pct||0)-(a.descuento_pct||0); });
+    }else if(sort === "priceAsc"){
+      out.sort(function(a,b){ return (a.precio_oferta||0)-(b.precio_oferta||0); });
+    }else if(sort === "priceDesc"){
+      out.sort(function(a,b){ return (b.precio_oferta||0)-(a.precio_oferta||0); });
+    }
+
+    filtered = out;
+    rendered = 0;
+    grid.innerHTML = "";
+    metaEl.hidden = false;
+
+    var anyFilter = q || store || cat;
+    clearBtn.hidden = !anyFilter;
+    countEl.innerHTML = "<b>"+filtered.length.toLocaleString("es-CL")+"</b> "+
+      (filtered.length===1?"oferta":"ofertas");
+    subEl.textContent = anyFilter ? "filtradas de "+ALL.length.toLocaleString("es-CL") : "disponibles";
+
+    if(filtered.length === 0){
+      emptyEl.hidden = false;
+      moreBtn.hidden = true;
+      return;
+    }
+    emptyEl.hidden = true;
+    renderMore();
+  }
+
+  // ---- Render por lotes ----
+  function renderMore(){
+    var end = Math.min(rendered + BATCH, filtered.length);
+    var frag = document.createDocumentFragment();
+    for(var i=rendered;i<end;i++){
+      frag.appendChild(buildCard(filtered[i]));
+    }
+    grid.appendChild(frag);
+    rendered = end;
+    moreBtn.hidden = rendered >= filtered.length;
+    if(!moreBtn.hidden){
+      moreBtn.textContent = "Ver mas ofertas ("+(filtered.length-rendered).toLocaleString("es-CL")+" restantes)";
+    }
+  }
+
+  function buildCard(it){
+    var a = document.createElement("a");
+    a.className = "card";
+    a.href = it.url_producto || "#";
+    a.target = "_blank";
+    a.rel = "noopener";
+
+    var disc = Number(it.descuento_pct)||0;
+    var color = colorFor(it.tienda);
+    var ppu = Number(it.precio_por_unidad)||0;
+    var hasOld = Number(it.precio_original) > Number(it.precio_oferta);
+
+    var unitHtml = (ppu>0 && it.unidad)
+      ? '<div class="unit">'+clp(ppu)+' / '+esc(it.unidad)+'</div>' : '';
+    var discHtml = disc>0 ? '<div class="badge-disc">-'+disc+'%</div>' : '';
+    var oldHtml = hasOld ? '<span class="price-old">'+clp(it.precio_original)+'</span>' : '';
+    var catHtml = it.categoria ? '<span class="cat-tag">'+esc(it.categoria)+'</span>' : '';
+
+    var imgHtml = it.imagen_url
+      ? '<img src="'+esc(it.imagen_url)+'" alt="'+esc(it.nombre_producto)+'" loading="lazy" '+
+        'onerror="this.style.display=\'none\';this.parentNode.insertAdjacentHTML(\'beforeend\',\'<span class=&quot;ph&quot;>&#128722;</span>\')">'
+      : '<span class="ph">&#128722;</span>';
+
+    a.innerHTML =
+      '<div class="card-img">'+discHtml+
+        '<span class="badge-store" style="background:'+color+'">'+esc(it.tienda)+'</span>'+
+        imgHtml+
+      '</div>'+
+      '<div class="card-body">'+
+        '<div class="brand">'+esc(it.marca||" ")+'</div>'+
+        '<div class="name">'+esc(it.nombre_producto)+'</div>'+
+        '<div class="price-row">'+
+          '<span class="price-now">'+clp(it.precio_oferta)+'</span>'+
+          oldHtml+
+        '</div>'+
+        unitHtml+
+        catHtml+
+      '</div>';
+    return a;
+  }
+
+  // ---- Eventos ----
+  qEl.addEventListener("input", debounce(apply, 220));
+  storeEl.addEventListener("change", apply);
+  catEl.addEventListener("change", apply);
+  sortEl.addEventListener("change", apply);
+  moreBtn.addEventListener("click", renderMore);
+  clearBtn.addEventListener("click", function(){
+    qEl.value=""; storeEl.value=""; catEl.value=""; apply();
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+
+  // Scroll infinito complementario
+  window.addEventListener("scroll", function(){
+    if(moreBtn.hidden) return;
+    var r = moreBtn.getBoundingClientRect();
+    if(r.top < window.innerHeight + 400) renderMore();
+  }, {passive:true});
+
+})();
+</script>
+</body>
+</html>

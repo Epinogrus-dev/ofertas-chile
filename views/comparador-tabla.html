@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparador de ofertas - Supermercados Chile</title>
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --panel:#ffffff;
+    --border:#e3e7ec;
+    --border-strong:#d0d6dd;
+    --text:#1c2530;
+    --muted:#6a7682;
+    --muted2:#8a95a1;
+    --accent:#0d6efd;
+    --offer:#137333;
+    --offer-bg:#e7f4ea;
+    --strike:#9aa4af;
+    --zebra:#fafbfc;
+    --hover:#eef4ff;
+    --disc:#c81e1e;
+    --disc-bg:#fdecec;
+    --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    padding-top:44px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:14px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+
+  /* ===== Top bar / header (debajo de los 44px) ===== */
+  .topbar{
+    position:sticky;
+    top:44px;
+    z-index:30;
+    background:linear-gradient(180deg,#ffffff,#fbfcfd);
+    border-bottom:1px solid var(--border);
+    box-shadow:var(--shadow);
+  }
+  .topbar-inner{
+    max-width:1380px;
+    margin:0 auto;
+    padding:12px 18px;
+  }
+  .brand{
+    display:flex;align-items:center;gap:11px;flex-wrap:wrap;
+  }
+  .brand .logo{
+    width:34px;height:34px;border-radius:9px;flex:0 0 auto;
+    background:linear-gradient(135deg,#0d6efd,#1fa02e);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:17px;
+    box-shadow:0 2px 6px rgba(13,110,253,.28);
+  }
+  .brand h1{
+    font-size:18px;margin:0;font-weight:800;letter-spacing:-.2px;
+  }
+  .brand .sub{color:var(--muted);font-weight:500;font-size:12.5px}
+  .brand .spacer{flex:1}
+  .stat-pill{
+    font-size:12px;color:var(--muted);
+    background:#f0f3f6;border:1px solid var(--border);
+    padding:4px 10px;border-radius:999px;white-space:nowrap;
+  }
+  .stat-pill b{color:var(--text)}
+
+  /* ===== Controls ===== */
+  .controls{
+    max-width:1380px;margin:0 auto;
+    padding:12px 18px 0;
+  }
+  .controls-row{
+    display:grid;
+    grid-template-columns:1.6fr 1fr 1fr 1.2fr;
+    gap:10px;
+  }
+  .field{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .field label{
+    font-size:11px;font-weight:700;color:var(--muted2);
+    text-transform:uppercase;letter-spacing:.04em;padding-left:2px;
+  }
+  .input,.select{
+    width:100%;
+    padding:9px 11px;
+    font-size:14px;
+    color:var(--text);
+    background:var(--panel);
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    outline:none;
+    transition:border-color .15s,box-shadow .15s;
+    font-family:inherit;
+  }
+  .select{appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236a7682' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;cursor:pointer;}
+  .input:focus,.select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,110,253,.14)}
+  .search-wrap{position:relative}
+  .search-wrap .ico{
+    position:absolute;left:11px;top:50%;transform:translateY(-50%);
+    width:16px;height:16px;color:var(--muted2);pointer-events:none;
+  }
+  .search-wrap .input{padding-left:34px}
+
+  .chips{
+    max-width:1380px;margin:0 auto;
+    padding:10px 18px 12px;
+    display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+  }
+  .chips .count{
+    font-size:13px;color:var(--muted);
+  }
+  .chips .count b{color:var(--text);font-size:14px}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12.5px;font-weight:600;
+    background:#eef2f6;border:1px solid var(--border);
+    color:#3a4753;padding:4px 8px 4px 10px;border-radius:999px;
+  }
+  .chip button{
+    border:none;background:#d8dee6;color:#52606d;border-radius:50%;
+    width:16px;height:16px;cursor:pointer;font-size:11px;line-height:1;
+    display:flex;align-items:center;justify-content:center;padding:0;
+  }
+  .chip button:hover{background:#c2cad4}
+  .clear-all{
+    margin-left:auto;font-size:12.5px;color:var(--accent);
+    background:none;border:none;cursor:pointer;font-weight:600;padding:4px 6px;
+  }
+  .clear-all:hover{text-decoration:underline}
+
+  /* ===== Table ===== */
+  .wrap{max-width:1380px;margin:0 auto;padding:0 18px 60px}
+  .table-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .table-scroll{overflow-x:auto}
+  table{
+    width:100%;border-collapse:collapse;min-width:840px;
+  }
+  thead th{
+    position:sticky;top:calc(44px + 0px);
+    background:#f7f9fb;
+    border-bottom:2px solid var(--border-strong);
+    text-align:left;
+    font-size:11.5px;font-weight:700;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.03em;
+    padding:11px 12px;white-space:nowrap;
+    user-select:none;z-index:5;
+  }
+  thead th.sortable{cursor:pointer}
+  thead th.sortable:hover{background:#eef2f6;color:var(--text)}
+  thead th .th-in{display:inline-flex;align-items:center;gap:5px}
+  .sort-arrow{font-size:10px;color:var(--accent);opacity:0;transition:opacity .12s}
+  th.active .sort-arrow{opacity:1}
+  th.active{color:var(--text)}
+  th.num{text-align:right}
+  th.num .th-in{flex-direction:row-reverse}
+
+  tbody td{
+    padding:9px 12px;border-bottom:1px solid #eef1f4;vertical-align:middle;
+  }
+  tbody tr:nth-child(even){background:var(--zebra)}
+  tbody tr:hover{background:var(--hover)}
+  tbody tr:last-child td{border-bottom:none}
+
+  .prod{display:flex;align-items:center;gap:11px;min-width:240px}
+  .thumb{
+    width:46px;height:46px;flex:0 0 auto;border-radius:8px;
+    background:#f2f4f7 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23c2c9d2' stroke-width='1.6'><rect x='3' y='3' width='18' height='18' rx='2'/><circle cx='8.5' cy='8.5' r='1.5'/><path d='M21 15l-5-5L5 21'/></svg>") center/22px no-repeat;
+    border:1px solid var(--border);object-fit:contain;
+  }
+  .prod-text{min-width:0}
+  .prod-name{
+    font-weight:600;color:var(--text);font-size:13.5px;line-height:1.3;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .prod-name:hover{color:var(--accent)}
+  .prod-meta{display:flex;align-items:center;gap:7px;margin-top:3px;flex-wrap:wrap}
+  .brand-tag{font-size:11.5px;color:var(--muted);font-weight:600}
+  .cat-tag{font-size:10.5px;color:var(--muted2);background:#f0f3f6;border-radius:4px;padding:1px 6px;border:1px solid var(--border)}
+
+  .badge{
+    display:inline-block;font-size:11.5px;font-weight:700;color:#fff;
+    padding:3px 9px;border-radius:6px;white-space:nowrap;letter-spacing:.01em;
+  }
+
+  .price-old{color:var(--strike);text-decoration:line-through;font-size:12.5px;white-space:nowrap}
+  .price-new{color:var(--offer);font-weight:800;font-size:15px;white-space:nowrap}
+  .price-na{color:var(--muted2)}
+  .disc{
+    display:inline-block;min-width:46px;text-align:center;
+    font-weight:800;font-size:12.5px;color:var(--disc);
+    background:var(--disc-bg);border:1px solid #f6cccc;
+    border-radius:6px;padding:3px 7px;white-space:nowrap;
+  }
+  .disc.zero{color:var(--muted2);background:#f0f3f6;border-color:var(--border)}
+  .unit{color:var(--muted);font-size:12.5px;white-space:nowrap}
+  .unit b{color:var(--text);font-weight:700}
+  .unit .u{color:var(--muted2);font-size:11px}
+
+  td.num{text-align:right}
+  .go{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:30px;height:30px;border-radius:7px;color:var(--muted);
+    border:1px solid transparent;transition:.12s;
+  }
+  tr:hover .go{border-color:var(--border-strong);background:#fff;color:var(--accent)}
+
+  /* ===== Footer / load more / states ===== */
+  .more-bar{display:flex;justify-content:center;padding:18px 0 4px}
+  .btn-more{
+    background:var(--panel);border:1px solid var(--border-strong);
+    color:var(--text);font-weight:700;font-size:14px;
+    padding:11px 26px;border-radius:9px;cursor:pointer;box-shadow:var(--shadow);
+    transition:.15s;
+  }
+  .btn-more:hover{border-color:var(--accent);color:var(--accent)}
+  .btn-more:disabled{opacity:.5;cursor:default}
+  .showing{
+    text-align:center;color:var(--muted2);font-size:12.5px;padding:6px 0 0;
+  }
+  .empty,.loading,.errmsg{
+    text-align:center;padding:60px 20px;color:var(--muted);
+  }
+  .empty .big,.errmsg .big{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .spinner{
+    width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--accent);
+    border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .skel-row td{padding:11px 12px}
+  .skel{height:14px;border-radius:5px;background:linear-gradient(90deg,#eef1f4 25%,#f6f8fa 50%,#eef1f4 75%);
+    background-size:200% 100%;animation:sh 1.2s infinite}
+  .skel.t{width:46px;height:46px;border-radius:8px}
+  @keyframes sh{to{background-position:-200% 0}}
+
+  /* ===== Mobile cards ===== */
+  @media(max-width:760px){
+    .controls-row{grid-template-columns:1fr 1fr}
+    .field.search-field{grid-column:1 / -1}
+    .wrap{padding:0 12px 60px}
+    .controls{padding:12px 12px 0}
+    .chips{padding:10px 12px 12px}
+    .topbar-inner{padding:11px 14px}
+
+    table,thead,tbody,th,td,tr{display:block}
+    thead{display:none}
+    table{min-width:0}
+    tbody tr{
+      background:var(--panel)!important;
+      border:1px solid var(--border);
+      border-radius:10px;margin-bottom:10px;padding:12px;
+      position:relative;box-shadow:var(--shadow);
+    }
+    tbody td{border:none!important;padding:0}
+    .table-card{background:transparent;border:none;box-shadow:none;overflow:visible}
+    .table-scroll{overflow:visible}
+    .prod{min-width:0;margin-bottom:10px;padding-right:42px}
+    .thumb{width:54px;height:54px}
+    .cell-store{position:absolute;top:12px;right:12px}
+    .m-prices{
+      display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+      padding-top:10px;border-top:1px dashed var(--border);
+    }
+    .m-prices .lbl{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:1px}
+    td.cell-old,td.cell-new,td.cell-disc,td.cell-unit{display:inline-block}
+    td.cell-go{position:absolute;bottom:12px;right:12px}
+    .go{border-color:var(--border-strong);background:#fff}
+  }
+  @media(max-width:420px){
+    .controls-row{grid-template-columns:1fr}
+    .field.search-field{grid-column:auto}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="logo">$</div>
+      <div>
+        <h1>Comparador de Ofertas</h1>
+        <div class="sub">Supermercados y retail de Chile · escanea y compara precios</div>
+      </div>
+      <div class="spacer"></div>
+      <div class="stat-pill" id="dbStat">Cargando base de datos…</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="controls-row">
+      <div class="field search-field">
+        <label for="q">Buscar producto o marca</label>
+        <div class="search-wrap">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="q" class="input" type="search" placeholder="Ej: aceite, leche, Coca-Cola…" autocomplete="off">
+        </div>
+      </div>
+      <div class="field">
+        <label for="fStore">Tienda</label>
+        <select id="fStore" class="select"><option value="">Todas las tiendas</option></select>
+      </div>
+      <div class="field">
+        <label for="fCat">Categoría</label>
+        <select id="fCat" class="select"><option value="">Todas las categorías</option></select>
+      </div>
+      <div class="field">
+        <label for="fSort">Ordenar por</label>
+        <select id="fSort" class="select">
+          <option value="disc">Mayor descuento</option>
+          <option value="priceAsc">Menor precio</option>
+          <option value="priceDesc">Mayor precio</option>
+          <option value="unitAsc">Menor precio por unidad</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="chips">
+    <span class="count"><b id="resCount">0</b> resultados</span>
+    <span id="activeChips" style="display:contents"></span>
+    <button class="clear-all" id="clearAll" style="display:none">Limpiar filtros</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="table-card">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable" data-sort="name">
+              <span class="th-in">Producto <span class="sort-arrow">▲</span></span>
+            </th>
+            <th class="sortable" data-sort="store">
+              <span class="th-in">Tienda <span class="sort-arrow">▲</span></span>
+            </th>
+            <th class="sortable num" data-sort="orig">
+              <span class="th-in">Normal <span class="sort-arrow">▲</span></span>
+            </th>
+            <th class="sortable num" data-sort="price">
+              <span class="th-in">Oferta <span class="sort-arrow">▲</span></span>
+            </th>
+            <th class="sortable num" data-sort="disc">
+              <span class="th-in">% Desc <span class="sort-arrow">▲</span></span>
+            </th>
+            <th class="sortable num" data-sort="unit">
+              <span class="th-in">$/Unidad <span class="sort-arrow">▲</span></span>
+            </th>
+            <th class="num" style="width:48px"></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="states"></div>
+
+  <div class="more-bar" id="moreBar" style="display:none">
+    <button class="btn-more" id="btnMore">Ver más resultados</button>
+  </div>
+  <div class="showing" id="showing"></div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORE_COLORS = {
+    "Jumbo":"#1fa02e","Santa Isabel":"#d4213d","Unimarc":"#e31937","Tottus":"#e53935",
+    "Lider":"#0d6efd","Líder":"#0d6efd","Super10":"#f59e0b","Acuenta":"#0d47a1",
+    "Central Mayorista":"#7c3aed","Falabella":"#84bd00","Ripley":"#6b2d8b","Paris":"#111111",
+    "París":"#111111","Hites":"#e2001a","La Polar":"#e6007e"
+  };
+  var DEFAULT_COLOR = "#555";
+  var BATCH = 300;
+
+  var ALL = [];          // todos los items
+  var VIEW = [];         // items filtrados/ordenados
+  var rendered = 0;      // cuántos pintados del VIEW
+  var sortKey = "disc";  // clave de orden activa
+  var sortDir = -1;      // 1 asc, -1 desc
+
+  var tbody = document.getElementById("tbody");
+  var states = document.getElementById("states");
+  var moreBar = document.getElementById("moreBar");
+  var btnMore = document.getElementById("btnMore");
+  var showing = document.getElementById("showing");
+  var resCount = document.getElementById("resCount");
+  var dbStat = document.getElementById("dbStat");
+  var qInput = document.getElementById("q");
+  var fStore = document.getElementById("fStore");
+  var fCat = document.getElementById("fCat");
+  var fSort = document.getElementById("fSort");
+  var clearAll = document.getElementById("clearAll");
+  var activeChips = document.getElementById("activeChips");
+
+  function clp(n){
+    n = Number(n);
+    if(!isFinite(n) || n<=0) return null;
+    return "$" + n.toLocaleString("es-CL");
+  }
+  function esc(s){
+    return String(s==null?"":s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;");
+  }
+  function storeColor(t){ return STORE_COLORS[t] || DEFAULT_COLOR; }
+
+  // ---------- map sortKey de columna a comparador ----------
+  function sortDefDir(key){
+    // dirección por defecto al hacer click en encabezado
+    if(key==="orig"||key==="price"||key==="unit"||key==="name"||key==="store") return 1;
+    return -1; // disc
+  }
+  function compareFn(key,dir){
+    return function(a,b){
+      var av,bv;
+      switch(key){
+        case "name": av=(a.nombre_producto||"").toLowerCase(); bv=(b.nombre_producto||"").toLowerCase();
+                     return av<bv?-1*dir:av>bv?1*dir:0;
+        case "store": av=(a.tienda||"").toLowerCase(); bv=(b.tienda||"").toLowerCase();
+                     return av<bv?-1*dir:av>bv?1*dir:0;
+        case "orig": av=+a.precio_original||0; bv=+b.precio_original||0; break;
+        case "price": av=+a.precio_oferta||0; bv=+b.precio_oferta||0; break;
+        case "disc": av=+a.descuento_pct||0; bv=+b.descuento_pct||0; break;
+        case "unit": av=+a.precio_por_unidad||Infinity; bv=+b.precio_por_unidad||Infinity;
+                     // los "sin unidad" siempre al final
+                     if(!a.precio_por_unidad) av=Infinity; if(!b.precio_por_unidad) bv=Infinity;
+                     break;
+        default: av=0;bv=0;
+      }
+      if(av<bv) return -1*dir;
+      if(av>bv) return 1*dir;
+      return 0;
+    };
+  }
+
+  // ---------- filtros ----------
+  function applyFilters(){
+    var q = qInput.value.trim().toLowerCase();
+    var qparts = q ? q.split(/\s+/) : [];
+    var st = fStore.value;
+    var cat = fCat.value;
+
+    VIEW = ALL.filter(function(it){
+      if(st && it.tienda!==st) return false;
+      if(cat && it.categoria!==cat) return false;
+      if(qparts.length){
+        var hay = ((it.nombre_producto||"")+" "+(it.marca||"")).toLowerCase();
+        for(var i=0;i<qparts.length;i++){ if(hay.indexOf(qparts[i])===-1) return false; }
+      }
+      return true;
+    });
+
+    VIEW.sort(compareFn(sortKey,sortDir));
+
+    resCount.textContent = VIEW.length.toLocaleString("es-CL");
+    renderChips();
+    resetRender();
+  }
+
+  function resetRender(){
+    tbody.innerHTML = "";
+    rendered = 0;
+    states.innerHTML = "";
+    if(VIEW.length===0){
+      states.innerHTML =
+        '<div class="empty"><div class="big">Sin resultados</div>'+
+        'No encontramos ofertas con esos filtros. Prueba con otra búsqueda o limpia los filtros.</div>';
+      moreBar.style.display="none";
+      showing.textContent="";
+      return;
+    }
+    renderBatch();
+  }
+
+  function renderBatch(){
+    var end = Math.min(rendered+BATCH, VIEW.length);
+    var html = [];
+    for(var i=rendered;i<end;i++){
+      html.push(rowHTML(VIEW[i]));
+    }
+    tbody.insertAdjacentHTML("beforeend", html.join(""));
+    rendered = end;
+    updateMore();
+  }
+
+  function updateMore(){
+    if(rendered < VIEW.length){
+      moreBar.style.display="flex";
+      var rem = VIEW.length - rendered;
+      btnMore.textContent = "Ver más resultados ("+rem.toLocaleString("es-CL")+" restantes)";
+    }else{
+      moreBar.style.display="none";
+    }
+    showing.textContent = "Mostrando "+rendered.toLocaleString("es-CL")+" de "+VIEW.length.toLocaleString("es-CL");
+  }
+
+  function rowHTML(it){
+    var color = storeColor(it.tienda);
+    var url = /^https?:\/\//.test(it.url_producto||"") ? it.url_producto : "#";
+    var img = /^https?:\/\//.test(it.imagen_url||"") ? it.imagen_url : "";
+    var oldP = clp(it.precio_original);
+    var newP = clp(it.precio_oferta);
+    var disc = +it.descuento_pct||0;
+    var unitP = clp(it.precio_por_unidad);
+    var unitLbl = it.unidad ? esc(it.unidad) : "";
+
+    var imgHTML = img
+      ? '<img class="thumb" loading="lazy" src="'+esc(img)+'" alt="" onerror="this.style.visibility=\'hidden\'">'
+      : '<span class="thumb" aria-hidden="true"></span>';
+
+    var discHTML = disc>0
+      ? '<span class="disc">-'+disc+'%</span>'
+      : '<span class="disc zero">—</span>';
+
+    var unitHTML = unitP
+      ? '<span class="unit"><b>'+unitP+'</b> <span class="u">/'+unitLbl+'</span></span>'
+      : '<span class="unit price-na">—</span>';
+
+    return ''+
+    '<tr>'+
+      '<td class="cell-prod">'+
+        '<a class="prod" href="'+esc(url)+'" target="_blank" rel="noopener">'+
+          imgHTML+
+          '<span class="prod-text">'+
+            '<span class="prod-name">'+esc(it.nombre_producto)+'</span>'+
+            '<span class="prod-meta">'+
+              (it.marca?'<span class="brand-tag">'+esc(it.marca)+'</span>':'')+
+              (it.categoria?'<span class="cat-tag">'+esc(it.categoria)+'</span>':'')+
+            '</span>'+
+          '</span>'+
+        '</a>'+
+      '</td>'+
+      '<td class="cell-store">'+
+        '<span class="badge" style="background:'+color+'">'+esc(it.tienda)+'</span>'+
+      '</td>'+
+      '<td class="num cell-old">'+
+        '<span class="lbl">Normal</span>'+
+        (oldP?'<span class="price-old">'+oldP+'</span>':'<span class="price-na">—</span>')+
+      '</td>'+
+      '<td class="num cell-new">'+
+        '<span class="lbl">Oferta</span>'+
+        (newP?'<span class="price-new">'+newP+'</span>':'<span class="price-na">—</span>')+
+      '</td>'+
+      '<td class="num cell-disc">'+
+        '<span class="lbl">Desc</span>'+discHTML+
+      '</td>'+
+      '<td class="num cell-unit">'+
+        '<span class="lbl">$/Unidad</span>'+unitHTML+
+      '</td>'+
+      '<td class="num cell-go">'+
+        '<a class="go" href="'+esc(url)+'" target="_blank" rel="noopener" title="Ver en tienda" aria-label="Ver en tienda">'+
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>'+
+        '</a>'+
+      '</td>'+
+    '</tr>';
+  }
+
+  // ---------- chips de filtros activos ----------
+  function renderChips(){
+    var parts = [];
+    if(qInput.value.trim()) parts.push(chip("Búsqueda: \""+esc(qInput.value.trim())+"\"","q"));
+    if(fStore.value) parts.push(chip("Tienda: "+esc(fStore.value),"store"));
+    if(fCat.value) parts.push(chip("Categoría: "+esc(fCat.value),"cat"));
+    activeChips.innerHTML = parts.join("");
+    clearAll.style.display = parts.length ? "inline-block" : "none";
+  }
+  function chip(label,key){
+    return '<span class="chip">'+label+'<button data-clear="'+key+'" aria-label="Quitar filtro">✕</button></span>';
+  }
+
+  // ---------- sort header UI ----------
+  function setSortHeaders(){
+    var ths = document.querySelectorAll("thead th.sortable");
+    ths.forEach(function(th){
+      var key = th.getAttribute("data-sort");
+      var arrow = th.querySelector(".sort-arrow");
+      if(key===sortKey){
+        th.classList.add("active");
+        arrow.textContent = sortDir===1 ? "▲" : "▼";
+      }else{
+        th.classList.remove("active");
+      }
+    });
+  }
+  // sincroniza sortKey con el <select>
+  function syncSelectFromSort(){
+    if(sortKey==="disc") fSort.value="disc";
+    else if(sortKey==="price") fSort.value = sortDir===1?"priceAsc":"priceDesc";
+    else if(sortKey==="unit" && sortDir===1) fSort.value="unitAsc";
+  }
+
+  document.querySelectorAll("thead th.sortable").forEach(function(th){
+    th.addEventListener("click", function(){
+      var key = th.getAttribute("data-sort");
+      if(key===sortKey){ sortDir = -sortDir; }
+      else { sortKey = key; sortDir = sortDefDir(key); }
+      setSortHeaders();
+      syncSelectFromSort();
+      applyFilters();
+    });
+  });
+
+  fSort.addEventListener("change", function(){
+    var v = fSort.value;
+    if(v==="disc"){ sortKey="disc"; sortDir=-1; }
+    else if(v==="priceAsc"){ sortKey="price"; sortDir=1; }
+    else if(v==="priceDesc"){ sortKey="price"; sortDir=-1; }
+    else if(v==="unitAsc"){ sortKey="unit"; sortDir=1; }
+    setSortHeaders();
+    applyFilters();
+  });
+
+  // ---------- inputs ----------
+  var qTimer;
+  qInput.addEventListener("input", function(){
+    clearTimeout(qTimer);
+    qTimer = setTimeout(applyFilters, 160);
+  });
+  fStore.addEventListener("change", applyFilters);
+  fCat.addEventListener("change", applyFilters);
+
+  activeChips.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-clear]");
+    if(!b) return;
+    var k = b.getAttribute("data-clear");
+    if(k==="q") qInput.value="";
+    if(k==="store") fStore.value="";
+    if(k==="cat") fCat.value="";
+    applyFilters();
+  });
+  clearAll.addEventListener("click", function(){
+    qInput.value=""; fStore.value=""; fCat.value="";
+    applyFilters();
+  });
+
+  btnMore.addEventListener("click", renderBatch);
+
+  // scroll infinito (además del botón)
+  window.addEventListener("scroll", function(){
+    if(rendered>=VIEW.length) return;
+    var nearBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 700);
+    if(nearBottom) renderBatch();
+  }, {passive:true});
+
+  // ---------- poblar selects ----------
+  function populateSelects(){
+    var stores = {}, cats = {};
+    for(var i=0;i<ALL.length;i++){
+      var it = ALL[i];
+      if(it.tienda) stores[it.tienda]=(stores[it.tienda]||0)+1;
+      if(it.categoria) cats[it.categoria]=(cats[it.categoria]||0)+1;
+    }
+    var sKeys = Object.keys(stores).sort(function(a,b){return a.localeCompare(b,"es");});
+    var cKeys = Object.keys(cats).sort(function(a,b){return a.localeCompare(b,"es");});
+    sKeys.forEach(function(s){
+      var o=document.createElement("option"); o.value=s;
+      o.textContent=s+" ("+stores[s].toLocaleString("es-CL")+")"; fStore.appendChild(o);
+    });
+    cKeys.forEach(function(c){
+      var o=document.createElement("option"); o.value=c;
+      o.textContent=c+" ("+cats[c].toLocaleString("es-CL")+")"; fCat.appendChild(o);
+    });
+    dbStat.innerHTML = "<b>"+ALL.length.toLocaleString("es-CL")+"</b> ofertas · <b>"+
+      sKeys.length+"</b> tiendas · <b>"+cKeys.length+"</b> categorías";
+  }
+
+  // ---------- estados de carga ----------
+  function showLoading(){
+    var rows = "";
+    for(var i=0;i<10;i++){
+      rows += '<tr class="skel-row">'+
+        '<td><div class="prod"><div class="skel t"></div><div style="flex:1"><div class="skel" style="width:70%"></div><div class="skel" style="width:40%;margin-top:6px"></div></div></div></td>'+
+        '<td><div class="skel" style="width:64px"></div></td>'+
+        '<td class="num"><div class="skel" style="width:54px;margin-left:auto"></div></td>'+
+        '<td class="num"><div class="skel" style="width:60px;margin-left:auto"></div></td>'+
+        '<td class="num"><div class="skel" style="width:44px;margin-left:auto"></div></td>'+
+        '<td class="num"><div class="skel" style="width:64px;margin-left:auto"></div></td>'+
+        '<td></td></tr>';
+    }
+    tbody.innerHTML = rows;
+  }
+  function showError(msg){
+    tbody.innerHTML="";
+    states.innerHTML =
+      '<div class="errmsg"><div class="big">No pudimos cargar las ofertas</div>'+
+      esc(msg)+'<div style="margin-top:14px"><button class="btn-more" id="retry">Reintentar</button></div></div>';
+    var r=document.getElementById("retry");
+    if(r) r.addEventListener("click", load);
+  }
+
+  // ---------- carga ----------
+  function load(){
+    states.innerHTML="";
+    showLoading();
+    dbStat.textContent="Cargando base de datos…";
+    fetch("/api/ofertas")
+      .then(function(r){
+        if(!r.ok) throw new Error("Error "+r.status+" del servidor");
+        return r.json();
+      })
+      .then(function(data){
+        if(!Array.isArray(data)) throw new Error("Respuesta inesperada del servidor");
+        ALL = data;
+        populateSelects();
+        setSortHeaders();
+        applyFilters();
+      })
+      .catch(function(e){
+        showError(e.message || "Revisa tu conexión e inténtalo de nuevo.");
+        dbStat.textContent="Error de carga";
+      });
+  }
+
+  setSortHeaders();
+  load();
+})();
+</script>
+</body>
+</html>
