@@ -1,0 +1,71 @@
+name: Scrape ofertas y publicar
+
+# Corre el scraper 2 veces al dia, genera el sitio estatico (site/) y lo
+# publica en GitHub Pages como artefacto. Los datos NO se commitean al repo:
+# viven como artefacto de Pages, asi el historial de git no crece sin limite.
+on:
+  schedule:
+    # 11:00 y 23:00 UTC = 07:00 y 19:00 hora de Chile (UTC-4 en invierno)
+    - cron: "0 11,23 * * *"
+  workflow_dispatch: {}   # boton "Run workflow" para correr manual
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita corridas/deploys solapados
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        # Las 13 tiendas activas usan solo requests (Playwright es solo para probe/).
+        run: pip install "requests>=2.31"
+
+      - name: Correr scraper (genera site/data/)
+        run: python run.py
+
+      - name: Verificar que el sitio tiene datos
+        # Guardarrail: si los WAF bloquean la IP de Actions y quedan pocas
+        # ofertas, falla en vez de publicar un sitio casi vacio.
+        run: |
+          python - <<'PY'
+          import json, sys
+          idx = json.load(open("site/data/index.json", encoding="utf-8"))
+          print(f"Total ofertas: {idx['total']} en {len(idx['tiendas'])} tiendas")
+          for t in idx["tiendas"]:
+              print(f"  {t['nombre']:18} {t['ofertas']:6}")
+          if idx["total"] < 2000:
+              sys.exit(f"Muy pocas ofertas ({idx['total']}): posible bloqueo. No publico.")
+          PY
+
+      - name: Habilitar GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
