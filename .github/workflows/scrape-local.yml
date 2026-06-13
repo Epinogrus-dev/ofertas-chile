@@ -1,0 +1,78 @@
+name: Scrape completo (self-hosted) y publicar
+
+# Corre en el self-hosted runner (tu PC, IP residencial chilena) -> scrapea
+# las 13 tiendas SIN bloqueo WAF, congela el histórico inmutable (Capa 1) y
+# publica el sitio. Es la corrida "primaria": cuando el PC está encendido,
+# refresca las 13 y hace crecer historia/. El workflow en la nube (scrape.yml)
+# queda como respaldo para las 8 tiendas que sí pasan desde datacenter.
+on:
+  schedule:
+    - cron: "0 10 * * *"   # 1x/día; solo se ejecuta si el runner está online
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: [self-hosted, self-hosted-cl]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependencias
+        shell: bash
+        run: python -m pip install --quiet --disable-pip-version-check "requests>=2.31"
+
+      - name: Correr scraper (13 tiendas)
+        shell: bash
+        run: python run.py
+
+      - name: Verificar que el sitio tiene datos
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, sys
+          idx = json.load(open("site/data/index.json", encoding="utf-8"))
+          print(f"Total ofertas: {idx['total']} en {len(idx['tiendas'])} tiendas")
+          for t in idx["tiendas"]:
+              print(f"  {t['nombre']:18} {t['ofertas']:6}  {t.get('actualizado','')}")
+          if idx["total"] < 5000:
+              sys.exit(f"Muy pocas ofertas ({idx['total']}): algo falló. No publico.")
+          PY
+
+      - name: Commit histórico + datos del sitio
+        shell: bash
+        run: |
+          git config user.name "ofertas-bot"
+          git config user.email "actions@github.com"
+          git add historia/ site/data/ data/ofertas.csv
+          if git diff --cached --quiet; then
+            echo "Sin cambios."
+          else
+            git commit -m "datos: corrida local completa $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
+
+      - name: Habilitar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -8,3 +8,6 @@ data/_run.log
 probe/captures/
 probe/*.html
 probe/*.json
+
+# salida derivada del analisis (reconstruible desde historia/)
+analisis/salida/
