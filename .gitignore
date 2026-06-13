@@ -3,3 +3,8 @@ __pycache__/
 .venv/
 venv/
 data/_run.log
+
+# artefactos de descubrimiento (capturas pesadas, no codigo)
+probe/captures/
+probe/*.html
+probe/*.json

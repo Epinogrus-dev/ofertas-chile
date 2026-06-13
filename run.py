@@ -13,7 +13,7 @@ import os
 import time
 
 from ofertas.validate import filtrar
-from ofertas.storage import escribir_csv
+from ofertas.storage import escribir_csv, escribir_json
 
 logging.basicConfig(
     level=logging.INFO,
@@ -68,6 +68,8 @@ def main():
     validas, rechazos = filtrar(crudas)
 
     n = escribir_csv(validas, args.out)
+    json_dir = os.path.join(BASE, "site", "data")
+    nt_json = escribir_json(validas, json_dir)
 
     print("\n" + "=" * 56)
     print(f"  RESUMEN  ({len(crudas)} crudas -> {len(validas)} validas)")
@@ -82,7 +84,8 @@ def main():
         for motivo, c in sorted(rechazos.items(), key=lambda x: -x[1]):
             print(f"  {c:5}  {motivo}")
     print("=" * 56)
-    print(f"  CSV: {args.out}  ({n} filas)")
+    print(f"  CSV:  {args.out}  ({n} filas)")
+    print(f"  JSON: {json_dir}  ({nt_json} tiendas, para el sitio)")
     print("=" * 56)
 
 

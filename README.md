@@ -129,19 +129,30 @@ que no cumplen se descartan y se reportan por motivo. También se deduplica por 
 
 ```
 ofertas-super/
-├── run.py                      # orquestador -> CSV
+├── run.py                      # orquestador -> CSV + JSON del sitio
+├── visor.py                    # visor web local (lee el CSV, 5+1 diseños)
+├── PLAN.md                     # plan de publicación gratuita y mejoras
 ├── ofertas/
 │   ├── model.py                # modelo Oferta + parseo de precios
 │   ├── validate.py             # reglas de consistencia
-│   ├── storage.py              # escritura CSV (Excel)
-│   └── stores/
+│   ├── storage.py              # escritura CSV (Excel) + JSON estático (sitio)
+│   └── stores/                 # un módulo por tienda (13) + bases reutilizables
 │       ├── _cencosud.py        # base Jumbo + Santa Isabel
-│       ├── _browser.py         # base interceptación con navegador (reutilizable)
-│       ├── jumbo.py  santaisabel.py  unimarc.py  tottus.py  lider.py
+│       ├── _instaleap.py       # base Acuenta + Central Mayorista
+│       ├── _browser.py         # base interceptación con navegador
 │       └── _lider_query.gql / _lider_vars.json   # query GraphQL persistida de Líder
 ├── data/                       # CSV de salida
+├── site/                       # sitio estático publicable (index.html + data/*.json)
+├── views/                      # diseños alternativos del visor local
 └── probe/                      # herramientas de descubrimiento de APIs (Playwright)
 ```
+
+## Sitio estático (`site/`)
+
+Cada corrida de `run.py` también genera `site/data/` (un JSON por tienda con claves
+cortas + `index.json` con resumen y fecha). `site/index.html` los consume directo,
+sin servidor — la carpeta `site/` se puede publicar tal cual en cualquier hosting
+estático (Cloudflare Pages, GitHub Pages). Ver `PLAN.md`.
 
 ## Agregar más categorías o tiendas
 
