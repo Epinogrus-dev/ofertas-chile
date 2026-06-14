@@ -56,6 +56,13 @@ jobs:
             git push
           }
 
+      - name: Asegurar bash y tar en PATH (Git for Windows)
+        # upload-pages-artifact empaqueta con bash+tar, que en el runner Windows
+        # no están en el PATH por defecto. Los agregamos para los pasos siguientes.
+        run: |
+          "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "C:\Program Files\Git\usr\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Habilitar GitHub Pages
         uses: actions/configure-pages@v5
 
