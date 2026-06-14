@@ -59,7 +59,16 @@ def main():
                     help="Ruta del CSV de salida")
     args = ap.parse_args()
 
-    tiendas = [args.store] if args.store else TIENDAS
+    tiendas = [args.store] if args.store else list(TIENDAS)
+
+    # Tiendas "solo-local": se saltan en la nube (EXCLUIR_TIENDAS=paris,...).
+    # La nube las preserva con su ultimo dato bueno del runner local. Util para
+    # tiendas con verificacion pesada o IP-sensible (ej. Paris chequea stock por
+    # producto, lento e inestable desde datacenter).
+    excluir = {t.strip().lower() for t in os.environ.get("EXCLUIR_TIENDAS", "").split(",") if t.strip()}
+    if excluir and not args.store:
+        tiendas = [t for t in tiendas if t not in excluir]
+        log.info("Excluyendo tiendas (EXCLUIR_TIENDAS): %s", ", ".join(sorted(excluir)))
 
     crudas = []
     for t in tiendas:

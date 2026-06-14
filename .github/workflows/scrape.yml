@@ -14,15 +14,22 @@ permissions:
   pages: write
   id-token: write
 
-# Evita corridas/deploys solapados
+# Grupo de concurrencia PROPIO de este workflow (no compartido con el
+# self-hosted): asi una corrida atascada de uno no bloquea al otro.
+# cancel-in-progress: una corrida nueva cancela la anterior del mismo grupo
+# (evita que una corrida colgada quede reteniendo el grupo indefinidamente).
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: pages-cloud
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Paris es "solo-local" (chequeo de stock por producto, lento/inestable desde
+    # datacenter). La nube lo salta y lo preserva con el ultimo dato del runner.
+    env:
+      EXCLUIR_TIENDAS: paris
     steps:
       - uses: actions/checkout@v4
 
