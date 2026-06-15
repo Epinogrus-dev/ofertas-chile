@@ -1,0 +1,15 @@
+{
+  "name": "Ofertas Chile — Comparador de descuentos",
+  "short_name": "Ofertas Chile",
+  "description": "Las mejores ofertas y descuentos reales de supermercados y retail de Chile, en un solo lugar.",
+  "lang": "es-CL",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fdf6ee",
+  "theme_color": "#ff5d3b",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
